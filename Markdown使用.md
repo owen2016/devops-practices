@@ -176,7 +176,7 @@ Markdown提供了一个特殊符号>用于段首进行强调，被强调的文�
 ![cmd-markdown-logo](https://www.zybuluo.com/static/img/logo.png)
 
 
-![Markdown教程-1.JPG](../images/Markdown教程-1.JPG)
+![Markdown教程-1.JPG](./images/Markdown教程-1.JPG)
 
 **注： 引用图片和链接的唯一区别就是在最前方添加一个感叹号。**
 
