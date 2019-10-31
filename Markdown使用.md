@@ -170,13 +170,15 @@ Markdown提供了一个特殊符号>用于段首进行强调，被强调的文�
 - title- 是图片的标题，当鼠标移到图片上时显示的内容。title可加可不加
 
 **示例：**
-![blockchain](https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=702257389,1274025419&fm=27&gp=0.jpg "区块链")
+![blockchain](https://images.gitee.com/uploads/images/2019/1027/001130_beaa2912_1803246.jpeg "区块链")
 
 
-![cmd-markdown-logo](https://www.zybuluo.com/static/img/logo.png)
+![cmd-markdown-logo](https://images.gitee.com/uploads/images/2019/1027/001131_e02874ec_1803246.png)
 
 
-![Markdown教程-1.JPG](./images/Markdown教程-1.JPG)
+` ![Markdown使用-1.JPG](./images/Markdown使用-1.JPG) `
+
+![Markdown教程-1.JPG](https://images.gitee.com/uploads/images/2019/1027/001120_c0e547b3_1803246.jpeg "Markdown使用-1.jpg")
 
 **注： 引用图片和链接的唯一区别就是在最前方添加一个感叹号。**
 
