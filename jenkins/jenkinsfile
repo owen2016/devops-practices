@@ -1,6 +1,4 @@
 pipeline {
-   
-     //参数使用
     parameters {
         string(
             name: 'PARAM_STRING',
@@ -32,6 +30,21 @@ pipeline {
     }
 
     stages {
+        stage('代码拉取并打包'){
+            steps {
+            echo "checkout from ${ITEMNAME}" 　　　　　　  
+            checkout ([$class: 'GitSCM', branches: [[name: '*/master']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[credentialsId: 'b96e05e1-193f-4e06-9195-fcaf31f579e9', url: 'http://10.10.10.217/test/test.git']]])
+            echo "开始打包 "　　　　　　　
+            sh 'export JAVA_HOME=/usr/local/java/jdk1.7.0_80 && cd $SRCCODE_DIR && mvn clean install -DskipTests -Denv=beta'    
+            }
+         }
+
+        stage('部署项目'){
+            steps {
+                echo "上传部署"
+                sh 'ansible-playbook -i /etc/ansible/hosts /etc/ansible/hzjry/main.yml -e "host=hzjry_admin"'
+            }            
+        }
 
         stage('withEnv Example') {
             steps {
