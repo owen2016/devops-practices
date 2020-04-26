@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: monitoring-influxdb
+  namespace: kube-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      task: monitoring
+      k8s-app: influxdb
+  template:
+    metadata:
+      labels:
+        task: monitoring
+        k8s-app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        #image: k8s.gcr.io/heapster-influxdb-amd64:v1.3.3
+        image: registry.cn-hangzhou.aliyuncs.com/magina-k8s/heapster-influxdb-amd64:v1.3.3
+        volumeMounts:
+        - mountPath: /data
+          name: influxdb-storage
+      volumes:
+      - name: influxdb-storage
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    task: monitoring
+    kubernetes.io/cluster-service: 'true'
+    kubernetes.io/name: monitoring-influxdb
+  name: monitoring-influxdb
+  namespace: kube-system
+spec:
+  type: NodePort
+  ports:
+  - nodePort: 31001
+    port: 8086
+    targetPort: 8086
+  selector:
+    k8s-app: influxdb
+#使用NotePort暴露monitoring-influxdb服务在主机的31001端口上，
+#那么InfluxDB服务端的地址：http://[host-ip]:31001 ，记下这个地址，以便创建heapster和为grafana配置数据源时，可以直接使用
