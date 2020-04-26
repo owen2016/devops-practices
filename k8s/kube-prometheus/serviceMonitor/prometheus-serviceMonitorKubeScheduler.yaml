@@ -7,12 +7,14 @@ metadata:
   namespace: monitoring
 spec:
   endpoints:
-  - interval: 30s
+  - interval: 30s # 每30s获取一次信息
     port: http-metrics
   jobLabel: k8s-app
-  namespaceSelector:
+  namespaceSelector: # 表示去匹配某一命名空间中的service，如果想从所有的namespace中匹配用any: true
     matchNames:
     - kube-system
-  selector:
+  selector:   # 匹配的 Service 的labels，如果使用mathLabels，则下面的所有标签都匹配时才会匹配该service，如果使用matchExpressions，则至少匹配一个标签的service都会被选择
     matchLabels:
       k8s-app: kube-scheduler
+
+#系统中根本就没有对应的 Service，所以需要手动创建一个 Service：（prometheus-kubeSchedulerService.yaml）
