@@ -1,0 +1,27 @@
+version: '2.2'
+services:
+  spring-boot-eureka:
+    build:
+      context: ./spring-boot-eureka
+      args:
+        - JAR_FILE=spring-boot-eureka.jar
+    restart: always
+    ports:
+      - 8761:8761
+    container_name: spring-boot-eureka
+    hostname: spring-boot-eureka
+    image: spring-boot-eureka
+
+  spring-boot-hello:
+    build:
+      context: ./spring-boot-hello
+      args:
+        - JAR_FILE=spring-boot-hello.jar
+    restart: always
+    ports:
+      - 8762:8762
+    container_name: spring-boot-hello
+    hostname: spring-boot-hello
+    image: spring-boot-hello
+    depends_on:
+      - spring-boot-eureka

@@ -1,0 +1,11 @@
+---
+
+- name: Deploy Java App
+  hosts: localhost
+
+  vars_files:
+    - defaults/main.yml
+
+  tasks:
+  - name: include main task
+    include: tasks/main.yml

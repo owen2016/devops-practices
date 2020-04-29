@@ -1,0 +1,192 @@
+pipeline {
+    agent any 
+
+    parameters {
+        //booleanParam(name: 'IsCICD', defaultValue: 'true', description: '是否立即部署?')
+        choice(name: 'CHOICES', choices: ['CI', 'CD', 'CICD'], description: '选择build类型')       
+    }
+
+   // tools
+   // {
+       // maven 'mvn-3.5.4'
+    //}
+
+    environment {
+      TOOLS_PATH = "C:\\Java_DevDir\\apache-maven-3.6.2\\bin"
+    }    
+
+    stages {
+        stage('Build') {
+            steps {   
+                //script
+                //{
+                    //def job = Jenkins.instance.getItemByFullName(env.JOB_NAME, Job.class)
+                    //def job = Jenkins.instance.getItem("simple-java-maven-artifact")
+                   // job.nextBuildNumber = "$VERSION"  //必须是int 类型
+                   //job.saveNextBuildNumber()
+                //}
+                script {VERSION_NUMBER = VersionNumber([projectStartDate: '2019-10-26', 
+                    // skipFailedBuilds: true, //如果build失败 是否跳过
+                    //versionNumberString: '${YEARS_SINCE_PROJECT_START, XX}.${BUILD_MONTH, XX}.${BUILDS_THIS_MONTH}', 
+                    //versionNumberString : '${BUILD_YEAR}.${BUILD_MONTH}.${BUILD_ID}',
+                    versionNumberString: '1.2.1.${BUILDS_ALL_TIME}',
+                    versionPrefix: 'v']);
+
+                    echo "VERSION_NUMBER: $VERSION_NUMBER" ;  
+                    currentBuild.displayName = "${VERSION_NUMBER}"
+                    currentBuild.description = "simple-java-maven-artifact"
+                    }                          
+                
+                echo "Running ${env.BUILD_NUMBER} on ${env.JENKINS_URL}\nRunning ${env.BUILD_ID} on ${env.JENKINS_URL}"
+                echo "Running ${env.BUILD_DISPLAY_NAME} on ${env.JENKINS_URL}"
+                echo "Running ${env.WORKSPACE} on ${env.JENKINS_URL}"
+                 
+                //sh "hostname"
+                //sh "uptime"
+                //sh 'printenv | sort'  //linux 打印环境变量          
+
+                // 相当于sh 'pwd'
+                bat 'cd'
+
+                bat 'set' // windows 打印环境变量
+                // echo env.PATH // linux
+                bat "echo %PATH%"
+                script
+                {
+                    if (params.CHOICES !='CD')  //skip build in CD pipeline
+                    {
+                        echo "Choice: ${params.CHOICES}"
+                        echo "Maven PATH $TOOLS_PATH"
+                        //sh 'mvn -B -DskipTests clean package'  //linux
+                        withEnv(['TOOLS_PATH=C:\\Java_DevDir\\apache-maven-3.6.2\\bin'])
+                        {
+                        bat "${TOOLS_PATH}/mvn -B -DskipTests clean package" //windows 注意单引号，双引号使用区别
+                        }
+                    }  
+                    else
+                    {
+                        echo "Choice: ${params.CHOICES}"
+                        echo "Skipping Build ..."
+                    }
+                    
+                }
+
+                              
+            }
+        } 
+        
+        stage('Archieve Artifacts'){
+            steps {
+                echo "archiving the artifacts"
+                bat 'cd'
+                archiveArtifacts 'target/*.jar'
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                //sh 'mvn test'
+                bat "${TOOLS_PATH}/mvn test" 
+            }
+            post {
+                always {
+                    //junit 'target/surefire-reports/*.xml'
+                    echo "Test"
+                }
+            }
+        }
+
+         stage ('push artifact') {
+            steps {
+                echo 'push artifact'
+               // sh 'mkdir archive'
+               //sh 'echo test > archive/test.txt'
+               //zip zipFile: 'test.zip', archive: false, dir: 'archive'
+               //archiveArtifacts artifacts: 'test.zip', fingerprint: true
+            }
+        }       
+
+        stage('Pre-Deploy') {
+            steps {                 
+                echo "Choice: ${params.CHOICES}"              
+                script
+                {
+                    if (params.CHOICES =='CD')
+                    {
+                      approvelMap = input(
+                        message: '发布到哪个个环境？', ok: '确定',
+                        parameters: [
+                            choice(name: 'ENV',
+                            choices: 'NULL\ndev\nstaging\nproduct', 
+                            description: '部署环境'),
+                            
+                            string (defaultValue: 'v1.2.1.18', description: '选择要部署的版本', name: '_SpecificVersion'),
+                            string (defaultValue: '', description: '额外参数', name: 'myparam')
+                            ],
+                            
+                        submitter:'admin,admin2,releaseGroup',
+                        submitterParameter: 'APPROVER')
+                    }
+                    else
+                    {
+                        echo "Skipping Pre-Deploy ..."
+                    }              
+                }              
+            }
+        }
+
+        stage('pull artifact') {
+            steps {
+                echo 'pull artifact'
+                //copyArtifacts filter: 'test.zip', fingerprintArtifacts: true, projectName: '${JOB_NAME}', selector: specific('${BUILD_NUMBER}')
+                //unzip zipFile: 'test.zip', dir: './archive_new'
+                //sh 'cat archive_new/test.txt'
+            }
+        }
+
+         stage('Deploy') {
+            steps {               
+                script
+                {
+                    if (params.CHOICES =='CD')
+                    {
+                      echo "操作者是 ${approvelMap['APPROVER']}"
+                      echo "部署环境 ${approvelMap['ENV']}"
+                      echo "参数-myparam： ${approvelMap['myparam']}"
+                      echo "部署版本： ${approvelMap['_SpecificVersion']}"
+                                          
+                      echo "Deploy artifact from specific version build"
+                     
+                     // 下面这个会自动触发另外的build
+                     // def built = build('simple-java-maven-artifact');  // https://plugins.jenkins.io/pipeline-build-step
+                    //copyArtifacts(projectName: 'simple-java-maven-artifact', selector: specific("${built.number}"));
+                    
+
+                    step([$class: 'CopyArtifact',
+                                    //filter: '*.zip',
+                                    //fingerprintArtifacts: true,
+                                    projectName: 'simple-java-maven-artifact',
+                                   // selector: [$class: 'SpecificBuildSelector', buildNumber: '${BUILD_NUMBER}'] // 默认当前版本
+                                    selector: [$class: 'SpecificBuildSelector', buildNumber: "${approvelMap['_SpecificVersion']}" ]
+                            ])
+
+                      //copyArtifacts filter: '_Builds/BuildRelease/archive.zip', fingerprintArtifacts: true, projectName: 'MyBuildJob', selector: upstream()
+                     //step ([$class: 'CopyArtifact', projectName: 'Create_archive', filter: "packages/infra*.zip", target: 'Infra']);
+
+                    }   
+                    else if (params.CHOICES =='CICD') 
+                    {
+                        echo "Deploy current lastet artifact ..."
+                    } 
+                    else
+                    {
+                        echo "Skipping deployment ...."
+                    }       
+                } 
+             
+            }
+        }
+    
+    }
+}
+

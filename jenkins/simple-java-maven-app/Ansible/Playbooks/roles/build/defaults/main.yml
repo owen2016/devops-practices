@@ -1,0 +1,5 @@
+---
+# defaults file for helloworld
+
+world: "world"
+workdir: "/home/motoubuntu/jenkins-agent/workspace/simple-java-maven-app"

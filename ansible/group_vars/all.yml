@@ -1,9 +1,9 @@
 harbor_domain: harbor.domain.com.cn
 
 mail:
-  host: mail2.augmentum.com.cn
+  host: mail2.devops.com.cn
   port: 25
-  username: eddychen@augmentum.com.cn
-  password: # 邮箱密码
+  username: owen@devops.com.cn
+  password: 
   to:
-  - eddychen@augmentum.com.cn
+  - owen@devops.com.cn

@@ -1,0 +1,10 @@
+---
+
+- name: 00-Work Directory
+  shell: cd {{ workdir }}
+
+- name: 01-Deploy Java App
+  command: echo "sh './jenkins/scripts/deliver.sh'"
+
+- name: 02-echo 'Deploy Successfully'
+  command: echo "Deploy Successfully"

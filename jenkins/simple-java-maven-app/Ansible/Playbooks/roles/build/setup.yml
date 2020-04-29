@@ -1,0 +1,11 @@
+---
+
+- name: Build Java With Maven
+  hosts: localhost
+
+  vars_files:
+    - defaults/main.yml
+
+  tasks:
+  - name: include main task
+    include: tasks/main.yml

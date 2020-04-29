@@ -1,0 +1,32 @@
+pipeline {
+  agent {
+    node {
+      label 'Linux'
+    }
+
+  }
+  stages {
+    stage('Build') {
+      steps {
+        sh 'echo "Hello world!"'
+      }
+    }    
+  }
+  post {
+      failure
+      {
+        updateGitlabCommitStatus name: 'build', state: 'failed'
+      }
+
+      success
+      {
+        updateGitlabCommitStatus name: 'build', state: 'success'
+      }
+    }
+
+    options {
+      // 构建结果更新到gitlab 相应的commit 记录上
+      gitLabConnection('243-gitlab-token')  //gitlab token defined in configuration system of Jenkins
+
+    }
+}
