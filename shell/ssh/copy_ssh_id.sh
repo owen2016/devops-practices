@@ -39,24 +39,18 @@ if [[ $? -ne 127 ]]; then
 
 	if [ -r ${HOME}/.ssh/id_rsa-ops.pub ]; then
 		# Copy public key to other server.
-		if [ -f server-list.txt ]; then
-		    echo "################`date +%Y-%m-%d,%H:%M:%S` START TO DO SSH-COPY-ID ACTION.##############"
-			for server in `cat server-list.txt`;  
-			do 			    
-				sshpass -p${password} ssh-copy-id -i ${HOME}/.ssh/id_rsa-ops.pub  -o StrictHostKeyChecking=no ${user}@${server}  
-
-				if [ $? -eq 0 ]; then
-				    echo `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${server} success."
-					write_log `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${server} success."
-				else
-				    echo `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${server} failed."
-					write_log `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${server} failed."
-				fi				
-			done
-			echo "#################################`date +%Y-%m-%d,%H:%M:%S` END...#########################"
+		echo "################`date +%Y-%m-%d,%H:%M:%S` START TO DO SSH-COPY-ID ACTION.##############"			
+		cat hostsname.txt | awk '{print $0}'| while read ip user pwd; do	   
+		sshpass -p${pwd} ssh-copy-id -f -i ${HOME}/.ssh/id_rsa-ops.pub -o StrictHostKeyChecking=no ${user}@${ip}  2>/dev/null
+		if [ $? -eq 0 ]; then
+		    echo `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} success."
+		    write_log `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} success."
 		else
-		    echo `date +%Y-%m-%d,%H:%M:%S` "No server-list.txt file."
-			write_log `date +%Y-%m-%d,%H:%M:%S` "No server-list.txt file."
-		fi
+			echo `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} failed."
+			write_log `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} failed."
+		fi				
+		done
+		echo "#################################`date +%Y-%m-%d,%H:%M:%S` END...#########################"
+		
 	fi
 fi
