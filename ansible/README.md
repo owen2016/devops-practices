@@ -1,5 +1,12 @@
 # ansible scripts
 
+## k8s 部署
+
+- ansible-playbook ./playbooks/k8s.yml -i hosts -e ansible_python_interpreter=/usr/bin/python3
+
+
+- ansible-playbook playbooks/jenkins.yml -i hosts
+
 ## jenkins-ansible-supervisor-deploy
 Use jenkins, ansible, supervisor to deploy java application.
 

@@ -1,0 +1,17 @@
+- hosts: kubernetes-master
+  vars:
+    kubernetes_allow_pods_on_master: False
+    kubernetes_role: "master"
+  roles:
+    - docker
+    - kubernetes
+
+
+- hosts: kubernetes-node
+  vars:
+    kubernetes_allow_pods_on_master: False
+    kubernetes_role: "node"
+
+  roles:
+    - docker
+    - kubernetes

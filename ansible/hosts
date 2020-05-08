@@ -1,3 +1,22 @@
 
-[localhost]
-127.0.0.1   ansible_ssh_user=root    ansible_ssh_pass=12345
+[all:vars]
+ansible_become=yes
+#ansible_become_user=owen
+ansible_become_pass=abc123_
+
+[test1]
+192.168.31.101
+
+[jenkins]
+192.168.4.240x
+
+[java]
+192.168.4.241x
+192.168.4.242x
+
+[kubernetes-master]
+192.168.31.101
+
+[kubernetes-node]
+192.168.31.102
+192.168.31.103

@@ -1,0 +1,8 @@
+
+- hosts: test1
+  tasks:
+      - name: just test
+        #become: yes
+        #become_user: owen
+        #become_method: sudo
+        shell: mkdir -p ~/test24
