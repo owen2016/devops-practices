@@ -4,7 +4,7 @@ ansible_become=yes
 #ansible_become_user=owen
 ansible_become_pass=abc123_
 
-[test1]
+[test3]
 192.168.31.101
 
 [jenkins]
@@ -14,9 +14,4 @@ ansible_become_pass=abc123_
 192.168.4.241x
 192.168.4.242x
 
-[kubernetes-master]
-192.168.31.101
 
-[kubernetes-node]
-192.168.31.102
-192.168.31.103
