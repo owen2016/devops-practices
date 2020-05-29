@@ -1,0 +1,15 @@
+version: "3"
+services:
+
+  jenkins:
+    restart: always
+    image: jenkins/jenkins:latest
+    container_name: my_jenkins
+    volumes:
+      - jenkins_default:/var/jenkins_home
+    ports:
+      - "8080:8080"
+      - "50000:50000"
+
+volumes:
+  jenkins_default:
