@@ -5,12 +5,12 @@ metadata:
   name: mysql #RC名称，全局唯一
 spec:
   replicas: 1 #Pod副本的期待数量
-  selector:
+  selector:  #RC 的Pod标签选择器
     app: mysql #符合目标的Pod拥有此标签
   template: #根据此模板创建Pod的副本（实例）
     metadata:
       labels:
-        app: mysql #Pod副本拥有的标签，对应RC的Selector
+        app: mysql #Pod副本拥有的标签，必须对应匹配RC的spec.selector，否则找不到会陷入恶性循环不停创建
     spec:
       containers: #Pod内容器的定义部分
       - name: mysql #容器的名称

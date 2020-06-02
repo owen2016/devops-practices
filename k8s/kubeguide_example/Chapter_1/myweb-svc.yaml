@@ -4,9 +4,9 @@ kind: Service
 metadata:
   name: myweb
 spec:
-  type: NodePort
+  type: NodePort #开启NodePort方式的外网访问模式
   ports:
   - port: 8080
-    nodePort: 30001
+    nodePort: 30001 # 开启NodePort方式的外网访问模式
   selector:
     app: myweb
