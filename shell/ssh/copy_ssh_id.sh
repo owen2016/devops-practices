@@ -25,8 +25,8 @@ fi
 
 if [[ $? -ne 127 ]]; then
 	# Generate ssh key.
-	if [ ! -r ${HOME}/.ssh/id_rsa-ops.pub ]; then
-		ssh-keygen -t rsa -f ~/.ssh/id_rsa-ops -N "" -q
+	if [ ! -r ${HOME}/.ssh/id_rsa_devops.pub ]; then
+		ssh-keygen -t rsa -f ~/.ssh/id_rsa_devops -N "" -q
 
 		if [[ $? -eq 0 ]]; then
 		    echo `date +%Y-%m-%d,%H:%M:%S` "ssh-keygen success"
@@ -37,11 +37,11 @@ if [[ $? -ne 127 ]]; then
 		fi
 	fi
 
-	if [ -r ${HOME}/.ssh/id_rsa-ops.pub ]; then
+	if [ -r ${HOME}/.ssh/id_rsa_devops.pub ]; then
 		# Copy public key to other server.
 		echo "################`date +%Y-%m-%d,%H:%M:%S` START TO DO SSH-COPY-ID ACTION.##############"			
 		cat hostsname.txt | awk '{print $0}'| while read ip user pwd; do	   
-		sshpass -p${pwd} ssh-copy-id -f -i ${HOME}/.ssh/id_rsa-ops.pub -o StrictHostKeyChecking=no ${user}@${ip}  2>/dev/null
+		sshpass -p${pwd} ssh-copy-id -f -i ${HOME}/.ssh/id_rsa_devops.pub -o StrictHostKeyChecking=no ${user}@${ip}  2>/dev/null
 		if [ $? -eq 0 ]; then
 		    echo `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} success."
 		    write_log `date +%Y-%m-%d,%H:%M:%S` "ssh-copy-id to server ${ip} success."
