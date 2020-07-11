@@ -1,3 +1,0 @@
-- hosts: java-maven-app-build
-  roles:
-     - { role: build }

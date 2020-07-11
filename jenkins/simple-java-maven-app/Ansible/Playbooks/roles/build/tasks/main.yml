@@ -1,9 +1,0 @@
----
-- name: 00-Work Directory
-  shell: cd /home/motoubuntu/jenkins-agent/workspace/simple-java-maven-app
-- name: Find out playbook's path
-  command: echo "Hello {{ workdir }}"
-- name: 01-Build Java App
-  command: echo "mvn -B -DskipTests clean package"
-- name: 02-echo 'Build Successfully'
-  command: echo "Build Successfully"

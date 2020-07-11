@@ -1,3 +1,0 @@
-- hosts: java-maven-app-deploy
-  roles:
-     - { role: deploy }

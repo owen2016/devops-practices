@@ -1,3 +1,0 @@
-- hosts: java-maven-app-test
-  roles:
-     - { role: test }

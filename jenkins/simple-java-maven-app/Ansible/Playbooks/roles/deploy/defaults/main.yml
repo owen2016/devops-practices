@@ -1,7 +1,0 @@
----
-# defaults file for helloworld
-
-world: "world"
-
-env: "uat"
-
