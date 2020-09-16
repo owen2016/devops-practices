@@ -1,13 +1,13 @@
 - hosts: jenkins
   vars:
-   #jenkins_hostname: jenkins.AugOps.com
+   #jenkins_hostname: jenkins.demo.com
    jenkins_http_port: 8080
    jenkins_version: "2.190.1"
    jenkins_pkg_url: "https://pkg.jenkins.io/debian-stable/binary/"
 
   roles:
-    - role: devops.java
+    - role: java
       become: yes
-    - role: devops.jenkins
+    - role: jenkins
       become: yes
 
