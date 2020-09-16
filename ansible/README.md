@@ -7,6 +7,8 @@
 
 - ansible-playbook playbooks/jenkins.yml -i hosts
 
+- ANSIBLE_HOST_KEY_CHECKING=False ansible -i hosts test1 -m shell -a "echo '{{ inventory_hostname }}'" -K
+
 ## jenkins-ansible-supervisor-deploy
 Use jenkins, ansible, supervisor to deploy java application.
 

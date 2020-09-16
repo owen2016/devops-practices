@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: pod
+metadata:
+name: devop-service
+labels:
+app: devops-service
+env: dev
+spce:
+nodeSelector:
+  compute:"true"
+containers:
+-image: devops/devops-service:v1.0
+ name: devops-service
+ ports:
+ -containerPort:8080
+  protocol: TCP
