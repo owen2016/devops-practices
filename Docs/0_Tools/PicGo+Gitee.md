@@ -6,7 +6,7 @@
 
 PicGo目前支持了微博图床，七牛图床，腾讯云COS v4\v5版本，又拍云，GitHub，SM.MS等，另外通过插件可以支持更多图床包括 gitee
 
-- <https://github.com/Molunerfinn/PicGo>
+- <https://github.com/Molunerfinn/PicGo>  
 
 ![picgo](https://gitee.com/owen2016/pic-hub/raw/master/pics/20200916222359.png)
 
@@ -14,6 +14,8 @@ PicGo目前支持了微博图床，七牛图床，腾讯云COS v4\v5版本，又
 
 - vs-picgo：PicGo 的 VS Code 版。
 - flutter-picgo：PicGo 的手机版（支持 Android 和 iOS ）。
+
+[更多PicGo插件](https://github.com/PicGo/Awesome-PicGo)
 
 ## 配置步骤
 
