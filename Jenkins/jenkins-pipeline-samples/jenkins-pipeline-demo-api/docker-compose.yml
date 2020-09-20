@@ -1,0 +1,23 @@
+version: "3.6"
+
+services:
+  jenkins-pipeline-demo-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        API_NAME: ${API_NAME}
+        API_PORT: ${API_PORT}
+        JMX_PORT: ${JMX_PORT}
+        DEBUG_PORT: ${DEBUG_PORT}
+    image: ${IMAGE_REGISTRY}/${API_NAME}:${IMAGE_TAG}
+    environment:
+      API_NAME: ${API_NAME}
+      API_PORT: ${API_PORT}
+      JMX_PORT: ${JMX_PORT}
+      DEBUG_PORT: ${DEBUG_PORT}
+      APP_ENVIRONMENT: ${APP_ENVIRONMENT}
+    ports:
+      - 9000:9000
+      - 9100:9100
+      - 9200:9200

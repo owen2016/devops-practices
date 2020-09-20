@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: tomcatservice
+spec:
+  type: LoadBalancer
+  selector:
+    app: tomcatserver
+  ports:
+    - port: 9200 # the service port
+      targetPort: 8080 # the pod port
+      #nodePort: 31000 # the node port - if not specified random port will be selected
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ab-deploy-tomcat
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: tomcatserver
+  template:
+    metadata:
+      labels:
+        app: tomcatserver
+        env: prod
+    spec:
+      containers:
+      - name: tomcat
+        image: abhijithvg/tomcat
+        ports:
+        - containerPort: 8080
