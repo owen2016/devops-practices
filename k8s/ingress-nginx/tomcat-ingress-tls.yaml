@@ -1,0 +1,20 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: ingress-tomcat-tls
+  namespace: default
+  annotations: 
+    kubernets.io/ingress.class: "nginx"
+spec:
+  tls:
+  - hosts:
+    - tomcat.magedu.com        #与secret证书的域名需要保持一致
+    secretName: tomcat-ingress-secret   #secret证书的名称
+  rules:
+  - host: tomcat.magedu.com
+    http:
+      paths:
+      - path: 
+        backend:
+          serviceName: tomcat
+          servicePort: 8080

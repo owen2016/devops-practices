@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: myweb
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      nodePort: 30001 #type=NodePort 和 nodePort=30001 的两个属性，表型此 Service开启了 NodePort方式的外网访问模式，在Kubernetes集群之外，比如在本机的浏览器里，可以通过 30001 这个端口访问myweb(对应 8080 的虚端口上)。
+  selector:
+    app: myweb
