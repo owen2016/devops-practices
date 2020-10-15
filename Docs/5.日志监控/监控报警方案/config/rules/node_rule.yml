@@ -1,0 +1,12 @@
+groups:
+- name: dmz-node-up
+  rules:
+  - alert: dmz-node-up
+    expr: up{job="dmz_monitor"} == 0
+    for: 15s #使 Prometheus 服务等待指定的时间, 然后执行查询表达式
+    labels: #允许指定额外的标签列表，把它们附加在告警上
+      severity: 1
+      team: node
+    annotations: #用于存储一些额外的信息，用于报警信息的展示之类的
+      summary: "{{ $labels.instance }} 已停止运行超过 15s！"
+      description: "{{ $labels.instance }} 检测到异常停止！请重点关注！！！"

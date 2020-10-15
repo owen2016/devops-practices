@@ -1,0 +1,12 @@
+
+groups:
+- name: blackbox_network_stats
+  rules:
+  - alert: blackbox_network_stats
+    expr: probe_success == 0
+    for: 2m  #如2分钟内持续为0  报警
+    labels:
+      severity: critical
+    annotations:
+      description: 'Job {{ $labels.job }} 中的 网站/接口 {{ $labels.instance }} 已经down掉超过一分钟.'
+      summary: '网站/接口 {{ $labels.instance }} down ! ! !'

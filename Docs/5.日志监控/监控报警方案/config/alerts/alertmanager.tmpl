@@ -1,0 +1,32 @@
+{{ define "email.to.title" }}
+{{ range .Alerts }}
+警告: 主机监控-发生警告通知, 实例-{{ .Labels.instance }}
+{{ end }}
+{{ end }}
+{{ define "email.to.html" }}
+{{ range .Alerts }}
+告警程序: prometheus_alert <br>
+告警级别: {{ .Labels.severity }} 级 <br>
+告警类型: {{ .Labels.alertname }} <br>
+故障主机: {{ .Labels.instance }} <br>
+告警主题: {{ .Annotations.summary }} <br>
+告警详情: {{ .Annotations.description }} <br>
+触发时间: {{ .StartsAt }} <br>
+{{ end }}
+{{ end }}
+{{ define "wechat.html" }}
+{{- if gt (len .Alerts.Firing) 0 -}}{{ range .Alerts }}
+@警报
+实例: {{ .Labels.instance }}
+信息: {{ .Annotations.summary }}
+详情: {{ .Annotations.description }}
+时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+{{ end }}{{ end -}}
+{{- if gt (len .Alerts.Resolved) 0 -}}{{ range .Alerts }}
+@恢复
+实例: {{ .Labels.instance }}
+信息: {{ .Annotations.summary }}
+时间: {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+恢复: {{ .EndsAt.Format "2006-01-02 15:04:05" }}
+{{ end }}{{ end -}}
+{{- end }}

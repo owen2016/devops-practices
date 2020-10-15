@@ -1,0 +1,13 @@
+#Template Example
+---
+- targets:
+    - 10.16.19.21:9090
+  labels:
+    city: Haidian
+    idc: RUC
+ 
+- targets:
+    - 10.32.19.21:9090
+  labels:
+    city: Haidian
+    idc: Laishui 

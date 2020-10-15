@@ -1,0 +1,49 @@
+global:
+  resolve_timeout: 5m
+  smtp_from: owenli@augmentum.com.cn
+  smtp_smarthost: mail2.augmentum.com.cn:25
+  smtp_auth_username: owenli@augmentum.com.cn
+  smtp_auth_password: abc123_
+  smtp_require_tls: false
+  smtp_hello: 'augmentum.com.cn'
+  # 企业号企业ID
+  wechat_api_corp_id: 'wwae5264748df759e9'
+  # 企业号应用SECRET
+  wechat_api_secret: 'CtLBt1o9T-wshnguKTtOzOLQwyQT1K5ATcI-vdlhQJc'
+templates:
+  - '/etc/alertmanager/alertmanager.tmpl'
+
+route:
+  group_by: ['alertname'] ## 这里的标签列表是接收到报警信息后的重新分组标签，例如，接收到的报警信息里面有许多具有 cluster=A 和 alertname=LatncyHigh 这样的标签的报警信息将会批量被聚合到一个分组里面
+  group_wait: 30s # 当一个新的报警分组被创建后，需要等待至少group_wait时间来初始化通知，这种方式可以确保您能有足够的时间为同一分组来获取多个警报，然后一起触发这个报警信息。
+  group_interval: 5m #当第一个报警发送后，等待'group_interval'时间来发送新的一组报警信息。
+  repeat_interval: 1h # 如果一个报警信息已经发送成功了，等待'repeat_interval'时间来重新发送他们
+  receiver: 'email' # 默认的receiver：如果一个报警没有被一个route匹配，则发送给默认的接收器
+  routes: # 上面所有的属性都由所有子路由继承，并且可以在每个子路由上进行覆盖。
+  - receiver: wechat
+    group_wait: 20s
+    match_re: #根据匹配正则符合的警告，指定接收器
+      alertname: 'dmz-node-up'
+
+receivers:
+- name: 'email'
+  email_configs:
+  - to: 'owenli@augmentum.com.cn'
+    html: '{{ template "email.to.html" . }}'
+    headers: { Subject: '{{ template "email.to.title" . }}'}
+    send_resolved: true
+- name: 'wechat'
+  wechat_configs:
+  # 企业号部门ID -通讯录部门ID
+  - to_party: '1'
+    # 企业号应用ID
+    agent_id: '1000002'
+    message: '{{ template "wechat.html" . }}'
+    send_resolved: true
+
+inhibit_rules: #抑制规则，是存在另一组匹配器匹配的情况下，使其他被引发警报的规则静音。这两个警报，必须有一组相同的标签。
+  - source_match:
+      severity: 'critical'
+    target_match:
+      severity: 'warning'
+    equal: ['alertname', 'dev', 'instance']
