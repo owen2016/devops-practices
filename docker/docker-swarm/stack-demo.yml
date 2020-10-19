@@ -1,0 +1,29 @@
+version: "3"
+services:
+  nginx:
+    image: nginx:alpine
+    ports:
+      - 87:80
+    deploy:
+      mode: replicated
+      replicas: 4
+visualizer:
+    image: dockersamples/visualizer
+    ports:
+      - "9001:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]
+portainer:
+    image: portainer/portainer
+    ports:
+      - "9002:9000"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+    deploy:
+      replicas: 1
+      placement:
+        constraints: [node.role == manager]

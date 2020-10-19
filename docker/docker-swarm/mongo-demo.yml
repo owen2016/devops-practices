@@ -1,0 +1,31 @@
+version: '3.4'
+services:
+  mongo:
+    image: mongo
+    restart: always
+    networks: 
+      - mongo_network
+    deploy:
+      restart_policy:
+        condition: on-failure
+      replicas: 2
+  mongo-express: 
+    image: mongo-express
+    restart: always
+    networks: 
+      - mongo_network
+    ports:
+      - target: 8081
+        published: 80
+        protocol: tcp
+        mode: ingress
+    environment:
+      ME_CONFIG_MONGODB_SERVER: mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+    deploy:
+      restart_policy:
+        condition: on-failure
+      replicas: 1
+networks:
+  mongo_network:
+    external: true
