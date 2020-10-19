@@ -1,0 +1,46 @@
+version: '3'
+services:
+  elasticsearch:
+    image: elasticsearch:6.8.12
+    container_name: elasticsearch
+    environment:
+      - "cluster.name=elasticsearch" #设置集群名称为elasticsearch
+      - "discovery.type=single-node" #以单一节点模式启动
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m" #设置使用jvm内存大小
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+    volumes:
+      - /data/elasticsearch/plugins:/usr/share/elasticsearch/plugins #插件文件挂载
+      - /data/elasticsearch/data:/usr/share/elasticsearch/data #数据文件挂载
+      - /data/elasticsearch/logs:/usr/share/elasticsearch/logs
+      - /data/elasticsearch/config:/usr/share/elasticsearch/config
+    hostname: elasticsearch
+    privileged: true
+    restart: always
+    ports:
+      - 9200:9200
+      - 9300:9300      
+  
+  kibana:
+    image: kibana:6.8.12
+    container_name: kibana
+    depends_on:
+      - elasticsearch #kibana在elasticsearch启动之后再启动
+    environment:
+      - ELASTICSEARCH_URL=http://elasticsearch:9200
+    restart: always
+    ports:
+      - 5601:5601
+  
+  logstash:
+    image: logstash:6.8.12
+    container_name: logstash
+    volumes:
+      - /data/logstash/pipeline/:/usr/share/logstash/pipeline/
+      # - /data/logstash/config/:/usr/share/logstash/config/ 自定义logstash启动配置时使用
+    depends_on:
+      - elasticsearch #kibana在elasticsearch启动之后再启动
+    privileged: true
+    ports:
+      - 4560-4570:4560-4570  
+      - 9600:9600 

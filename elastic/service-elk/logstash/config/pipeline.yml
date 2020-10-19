@@ -1,0 +1,23 @@
+
+# This file is where you define your pipelines. You can define multiple.
+# For more information on multiple pipelines, see the documentation:
+#   https://www.elastic.co/guide/en/logstash/current/multiple-pipelines.html
+
+- pipeline.id: main
+  path.config: "/usr/share/logstash/pipeline"
+
+## custom mutiple pipelines
+- pipeline.id: tcp
+  path.config: "/usr/share/logstash/pipeline/logstash_tcp.conf"
+
+- pipeline.id: springcloud
+  path.config: "/usr/share/logstash/pipeline/logstash_springcloud.conf"
+
+# - pipeline.id: daily   
+#   pipeline.workers: 1   
+#   pipeline.batch.size: 1   
+#   path.config: "/usr/share/logstash/pipeline/daily.conf"  
+
+# - pipeline.id: apache   
+#   queue.type: persisted   
+#   path.config: "/usr/share/logstash/pipeline/apache.conf"
