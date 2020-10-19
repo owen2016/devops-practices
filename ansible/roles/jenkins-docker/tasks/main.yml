@@ -1,0 +1,12 @@
+---
+# tasks file for jenkins_install
+- name: copy local file to remote jenkins server 
+  template:
+    src: docker-compose.yml
+    dest: /tmp/docker-compose-jenkins.yml
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: run jenkins-docker
+  shell: docker-compose -f /tmp/docker-compose-jenkins.yml -p jenkins up -d

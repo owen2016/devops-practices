@@ -1,7 +1,7 @@
 - hosts: java
 
   roles:
-    - role: devops.java
+    - role: java
       become: yes
 
 

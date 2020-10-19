@@ -1,0 +1,18 @@
+version: "3"
+services:
+  gitlab:
+    image: gitlab/gitlab-ce
+    container_name: gitlab
+    restart: always
+    hostname: 'gitlab.devopsing.site'
+    environment:
+      GITLAB_OMNIBUS_CONFIG: |
+        external_url "http://gitlab.devopsing.site"
+    ports:
+      - '88:80'
+      - '443:443'
+      - '2222:22'
+    volumes:
+      - '/srv/gitlab/config:/etc/gitlab'
+      - '/srv/gitlab/logs:/var/log/gitlab'
+      - '/srv/gitlab/data:/var/opt/gitlab'

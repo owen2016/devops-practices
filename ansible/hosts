@@ -1,11 +1,16 @@
 
 [all:vars]
-ansible_become=yes
+#ansible_become=yes
 #ansible_become_user=owen
-ansible_become_pass=abc123_
+#ansible_become_pass=abc123_
+ansible_python_interpreter=/usr/bin/python
 
-[test3]
-192.168.31.101
+192.168.31.201 key=value-2
+
+[test1]
+192.168.31.201
+[test1:vars]
+key=value-1
 
 [jenkins]
 192.168.4.240x

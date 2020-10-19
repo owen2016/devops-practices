@@ -1,8 +1,25 @@
 
 - hosts: test1
+  vars: 
+      key: test-ansible
   tasks:
-      - name: just test
+      - name: register varialbe        
+        shell: hostname
+        register: info
+      - name: display variable        
+        debug: msg="The varible Value is {{info['stdout']}}"  
+      - name: mkdir test
         #become: yes
         #become_user: owen
         #become_method: sudo
-        shell: mkdir -p ~/test24
+        shell: mkdir -p ~/test24   
+      - name: rm terst
+        shell: rm -r ~/test24      
+      - name: mkdir /tmp/test 
+        file: path=/tmp/test state=directory mode=0755 
+      - name: copy test.sh 
+        template: src=test.sh dest=/tmp/test/ 
+      - name: excute test.sh 
+        #command: chdir=/tmp/test sh test.sh  
+        debug: msg="The {{ inventory_hostname}} Value is {{key}}"   
+       # debug: msg="The {{ inventory_hostname}} Value is {{ansible_python_interpreter}}"   

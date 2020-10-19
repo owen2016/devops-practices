@@ -1,0 +1,12 @@
+---
+# tasks file for gitlab_install
+- name: copy local file to remote gitlab server 
+  template:
+    src: docker-compose.yml
+    dest: /tmp/docker-compose-gitlab.yml
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: run gitlab-docker
+  shell: docker-compose -f /tmp/docker-compose-gitlab.yml -p gitlab up -d

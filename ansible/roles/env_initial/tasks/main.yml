@@ -1,0 +1,33 @@
+---
+  #Set authorized key taken from file
+- include_tasks: ssh-auth.yml
+
+- name: update apt mirror
+  copy:
+    src: sources.list
+    dest: /etc/apt/sources.list
+    backup: yes
+
+- name: create docker config dir
+  shell: mkdir -p /etc/docker/
+
+- name: update docker mirror
+  copy:
+    src: daemon.json
+    dest: /etc/docker/daemon.json
+
+- name: update apt
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+# - name: install common debs packages
+#   apt:
+#     name: ['vim', 'python3', 'python3-pip']
+
+- name: update system timezone to Shanghai
+  file:
+    src: /usr/share/zoneinfo/Asia/Shanghai
+    dest: /etc/localtime
+    state: link
+    force: yes

@@ -1,0 +1,6 @@
+---
+# defaults file for env_initial
+ansible_python_interpreter: python3
+
+user_name: owen
+user_password: abc123_

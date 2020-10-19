@@ -1,0 +1,54 @@
+---
+- name: Checking if Harbor is already installed
+  stat:
+    path: "{{ harbor_install_dir }}/harbor"
+  register: harbor_folder_st
+
+- name: "Downloading Harbor {{ harbor_version }} (offline installer)"
+  get_url: url={{ harbor_url }} dest=/tmp/harbor.tgz validate_certs=no
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+
+- name: "Creating Harbor directory... ({{ harbor_install_dir }}/harbor)"
+  file:
+    path: "{{ harbor_install_dir }}"
+    state: directory
+    mode: o+r
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+
+- name: "Uncompressing Harbor installer..."
+  unarchive:
+    remote_src: True
+    src: /tmp/harbor.tgz
+    dest: "{{ harbor_install_dir }}"
+    creates: "{{ harbor_install_dir }}/harbor"
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+
+- name: Copying over harbor.yml
+  template:
+    src: harbor.yml
+    dest: "{{ harbor_install_dir }}/harbor/harbor.yml"
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+
+- name: Running Harbor installer...
+  become: yes
+  command: "./install.sh"
+  args:
+    chdir: "{{ harbor_install_dir }}/harbor"
+    creates: '{{ harbor_install_dir }}/harbor/harbor_install_log.txt'
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+
+- name: "Setting permissions on Harbor common folder......"
+  file:
+    dest: "{{ harbor_install_dir }}/harbor/common"
+    owner: 10000
+    mode: 0750
+    group: docker
+    recurse: yes
+  when:
+    - not harbor_folder_st.stat.exists or (harbor_folder_st.stat.isdir is defined and not harbor_folder_st.stat.isdir)
+

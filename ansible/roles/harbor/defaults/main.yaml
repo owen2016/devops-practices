@@ -1,0 +1,63 @@
+---
+# harbor_release: 1.7.0
+harbor_version: 2.0.0
+
+harbor_url: "https://owen-oss.oss-cn-zhangjiakou.aliyuncs.com/devops/harbor-offline-installer-v2.0.0.tgz?Expires=1594712941&OSSAccessKeyId=TMP.3Khyvfk2dTbKG5VjvNsxRPKWznquZo5DFRBRZG2bbahsYb4im5SSoUVzvfc6hJU8AwZEY1ZWbgiD2YmVeBwtCDYf2jLiH8&Signature=1ng1k%2BbFG1aBlgv1EyhxTfRPRAs%3D"
+
+harbor_installer_extra_args:
+harbor_extras:
+  # - clair
+  # - notary
+
+# Will create harbor folder inside
+harbor_install_dir: /opt
+# This is related to the internal Nginx. If you are running it behind a proxy that terminates
+# SSL, leave this on http. You will want to set `harbor_registry_realm_protocol` to "https", though.
+harbor_ui_url_protocol: "http"
+harbor_max_job_workers: 10
+harbor_port: 80
+
+# set to yes if you are running harbor behind an Nginx proxy
+# or elastic load balancing. This will remove the line
+# proxy_set_header X-Forwarded-Proto $scheme;
+# from Harbor's nginx configuration according to the troubleshooting section.
+# https://github.com/goharbor/harbor/blob/master/docs/installation_guide.md#troubleshooting
+# REMEMBER to put this line on YOUR proxy configuration, though.
+harbor_behind_proxy: no
+
+# If you are running behind a proxy and the proxy terminates SSL, you need to set this to "https"
+# as this dictates the *external* access to the registry.
+# This only takes effect if "harbor_behind_proxy" is True.
+harbor_registry_realm_protocol: "http"
+
+# Used in the docker compose file
+harbor_exposed_http_port: 80
+harbor_exposed_https_port: 443
+harbor_install: true
+harbor_self_registration: "on"
+
+# change these if you have your own redis running already
+harbor_redis_host: redis
+
+# If you have Harbor running on say "myregistry.company.com", that's what you should have as harbor_hostname
+harbor_hostname: "{{ hostvars[inventory_hostname]['ansible_default_ipv4']['address'] }}"
+harbor_datadir: "/data"
+harbor_ssl_self_days: 180
+harbor_ssl_self_subject: "/O=Harbor Server/OU=Self signed/CN=test"
+harbor_api_port: "{% if harbor_ui_url_protocol == 'http' %}{{harbor_exposed_http_port}}{% else %}{{harbor_exposed_https_port}}{% endif %}"
+# If you are running Harbor behind your own proxy, override this as it might not match with Harbor.cfg values.
+harbor_api_url: "{{ harbor_ui_url_protocol }}://{{ harbor_hostname }}:{{ harbor_api_port }}/api"
+
+# Example to create project on install
+# harbor_projects:
+#   - project_name: test
+#     is_public: "false"
+#     content_trust: "false"
+#     prevent_vul: "true"
+#     severity: "high"
+#     auto_scan: "true"
+
+
+harbor_installer_with: "{% for e in harbor_extras %} {{ '--with-%s'|format(e) }} {% endfor %}"
+harbor_extra_compose_files: "{% for e in harbor_extras %} + ['docker-compose.{{e}}.yml'] {% endfor %}"
+harbor_docker_compose_files: "['docker-compose.yml'] {{ harbor_extra_compose_files }} "

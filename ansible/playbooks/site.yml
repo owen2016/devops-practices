@@ -25,3 +25,45 @@
     - tomcat
     - deploy-war
 
+# - hosts: jenkins
+#   vars:
+#     #jenkins_hostname: jenkins.example.com
+#     jenkins_http_port: 8081
+  
+#   # pre_tasks:
+#   #   - include_tasks: java-8.yml
+
+#   roles:
+#     - role: geerlingguy.java
+#       become: yes
+#     - role: geerlingguy.jenkins
+#       become: yes
+
+#   post_tasks:
+#     - name: Ensure Jenkins is running on the specified port.
+#       uri:
+#         url: "http://127.0.0.1:{{ jenkins_http_port }}"
+#         status_code: 200
+#       register: result
+#       until: result.status == 200
+#       retries: 60
+#       delay: 1
+
+# - hosts: kubernetes_master
+
+#   vars:
+#     kubernetes_allow_pods_on_master: True
+#     kubernetes_role: "master"
+
+#   roles:
+#     - geerlingguy.docker
+#     - geerlingguy.kubernetes
+
+
+# - hosts: kubernetes_node
+#   vars:
+#     kubernetes_allow_pods_on_master: True
+#     kubernetes_role: "node"
+#   roles:
+#     - geerlingguy.docker
+#     - geerlingguy.kubernetes

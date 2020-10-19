@@ -1,0 +1,79 @@
+---
+# Create users
+# - name: create user
+#   user:
+#     name: "{{ item.user }}"
+#     password: "{{ item.password | password_hash('sha512') }}"
+#     state: present
+#   loop:
+#     - { user: "{{ user_name }}", password: "{{ project_user_password }}"}
+
+# Ensure ssh directory
+- name: Ensure .ssh directory for user and root home
+  file:
+    path: "{{ item.path }}"
+    state: directory
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0700"
+  with_items:
+    - { path: "/home/{{ user_name }}/.ssh", group: "{{ user_name }}", owner: "{{ user_name }}"}
+    - { path: /root/.ssh, group: root, owner: root}
+
+# Ensure authorized_keys file
+- name: Ensure authorized_keys file home
+  file:
+    path: "{{ item.path }}"
+    state: touch
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0600"
+  with_items:
+    - { path: "/home/{{ user_name }}/.ssh/authorized_keys", group: "{{ user_name }}", owner: "{{ user_name }}"}
+    - { path: /root/.ssh/authorized_keys, group: root, owner: root}
+
+# Add public key to server
+- name: Add public key to authorized_keys
+  copy:
+    src: "{{ item.file }}"
+    dest: "{{ item.dpath }}"
+    owner: "{{ item.owner }}"
+    group: "{{ item.group }}"
+    mode: "0644"
+  with_items:
+    - { file: id_rsa_devops.pub, dpath: "/home/{{ user_name }}/.ssh/id_rsa_devops.pub", group: "{{ user_name }}", owner: "{{ user_name }}"}
+    - { file: id_rsa_devops.pub, dpath: /root/.ssh/id_rsa_devops.pub, group: root, owner: root}
+
+# Add public key to authorized_keys
+- name: Add public key to authorized_keys
+  shell: /bin/echo $(/bin/cat {{ item.kname }}) >> {{ item.dpath }}
+  with_items:
+    - { dpath: "/home/{{ user_name }}/.ssh/authorized_keys", kname: "/home/{{ user_name }}/.ssh/id_rsa_devops.pub"}
+    - { dpath: /root/.ssh/authorized_keys, kname: /root/.ssh/id_rsa_devops.pub}
+
+# Open root access
+- name: Update sshd_config file to open root access
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PermitRootLogin prohibit-password"
+    line: "PermitRootLogin yes"
+
+# Open PubkeyAuthentication
+- name: Update sshd_config file to open pubkey auth
+  lineinfile:
+    dest: "/etc/ssh/sshd_config"
+    regexp: "^#?PubkeyAuthentication yes"
+    line: "PubkeyAuthentication yes"
+
+# Set sh link to bash
+# - name: Update /bin/sh link to /bin/bash not /bin/dash
+#   file:
+#     src: /bin/bash
+#     dest: /bin/sh
+#     state: link
+#     force: yes
+
+- name: Reload ssh
+  systemd:
+    name: ssh
+    state: reloaded
