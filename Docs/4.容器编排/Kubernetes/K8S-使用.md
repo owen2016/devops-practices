@@ -1,22 +1,5 @@
 
 
-K8s(容器编排工具) + Istio(解决微服务中的服务发现、负载均衡、故障恢复、指标收集和监控，构建网格服务，进行服务治理及流量控制等)
-
-K8s:
-* kubectl
-* kubeadm
-* K8s Master
-* * kubelet
-* * kube-proxy
-* * kube-apiserver
-* * kube-scheduler
-* * kube-controller-manager
-* * etcd
-* K8s Node
-* * kubelet
-* * kube-proxy
-* calico 
-* coredns
 
 Istio:
 * 数据平面

@@ -1,726 +1,166 @@
-﻿# kubernetes集群、istio安装2
-
-## 1. kubernetes集群机器
-| 机器IP | 机器hostname | K8s集群角色 | 机器操作系统 |
-| -- | -- | -- | -- |
-| 172.20.48.122 | 172-20-48-122 | master | ubuntu16.04 |
-| 172.20.48.123 | 172-20-48-123 | node | ubuntu16.04 |
-| 172.20.48.124 | 172-20-48-124 | node | ubuntu16.04 |
-
-> 使用如下命令设置hostname:
-```bash
-# 172.20.48.122
-hostnamectl --static set-hostname 172-20-48-122
-# 172.20.48.123
-hostnamectl --static set-hostname 172-20-48-123
-# 172.20.48.124
-hostnamectl --static set-hostname 172-20-48-124
-```
-
-Kubernetes v1.8+ 要求关闭系统 Swap，请在所有节点利用以下指令关闭
-
-``` sh
-swapoff -a && sed -i '/ swap / s/^/#/' /etc/fstab
-```
-
-## 2. 安装软件
-
-2.1 在每台机器上安装 docker。
-
-``` sh
-# step 1: 安装必要的一些系统工具
-sudo apt-get update
-sudo apt-get -y install apt-transport-https ca-certificates curl software-properties-common
-
-# step 2: 安装GPG证书
-curl -fsSL http://mirrors.aliyun.com/docker-ce/linux/ubuntu/gpg | sudo apt-key add -
-
-# Step 3: 写入软件源信息
-sudo add-apt-repository "deb [arch=amd64] http://mirrors.aliyun.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
-
-# Step 4: 更新并安装 Docker-CE
-sudo apt-get -y update
-sudo apt-get -y install docker-ce=17.03.0~ce-0~ubuntu-xenial
-```
-安装完 docker 后，用命令docker -v校验，能打印出 docker 的版本表示安装成功。
-
-
-2.2 在每台集群上安装 kubelet 、kubeadm 、kubectl ，以下以安装版本 1.11.1 为例。
-
-``` sh
-apt-get update && apt-get install -y apt-transport-https
-
-curl https://mirrors.aliyun.com/kubernetes/apt/doc/apt-key.gpg | apt-key add - 
-cat <<EOF >/etc/apt/sources.list.d/kubernetes.list
-deb https://mirrors.aliyun.com/kubernetes/apt/ kubernetes-xenial main
-EOF  
-
-apt-get update
-
-apt-get install -y kubelet=1.11.1-00 kubeadm=1.11.1-00 kubectl=1.11.1-00
-```
-
-##  3. 创建 kubernetes 集群
-
-3.1 在 master 节点 init 集群。
-
-``` sh
-kubeadm init --config master.config --ignore-preflight-errors=cri
-```
-master.config 文件提供以下为参考（这里 master 节点的 ip 为 172.20.48.122），请根据实际情况修改：
-
-如下命令修改master.config中IP：
-sed -i 's/172.20.48.122/${k8s_master_ip}' master.config
-
-```
-apiVersion: kubeadm.k8s.io/v1alpha2
-kind: MasterConfiguration
-kubernetesVersion: v1.11.0
-api:
-  advertiseAddress: 172.20.48.122
-  bindPort: 6443
-bootstrapTokens:
-- groups:
-  - system:bootstrappers:kubeadm:default-node-token
-  token: oiense.zunfelisnfdksief
-  ttl: 0s
-  usages:
-  - signing
-  - authentication
-etcd:
-  local:
-    dataDir: /var/lib/etcd
-    image: ""
-imageRepository: registry.cn-hangzhou.aliyuncs.com/k8sth
-networking:
-  dnsDomain: cluster.local
-  podSubnet: 10.32.0.0/12
-  serviceSubnet: 10.96.0.0/12
-nodeRegistration:
-  kubeletExtraArgs:
-    pod-infra-container-image: registry.cn-hangzhou.aliyuncs.com/k8sth/pause-amd64:3.1
-apiServerExtraArgs:
-  enable-admission-plugins: MutatingAdmissionWebhook,ValidatingAdmissionWebhook
-controllerManagerExtraArgs:
-  address: 0.0.0.0
-schedulerExtraArgs:
-  address: 0.0.0.0
-
-```
-
-这个过程会 pull 必要的镜像，可能时间会比较长，如果需要查看镜像有没有 pull 完，可以用 docker images 查看已经 pull 的镜像，一共需要如下镜像：
-
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155db207499e45b4.png)
-
-init 完后，可以看到如下提示：
-
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155db20ba6fe20e8.png)
-
-按照提示在 master 节点执行以下命令:
-
-``` sh
-mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-```
-
-3.2 在 worker 节点执行命令 join 到集群
-
-拷贝在 master 节点 init 后的 join 命令，在其他两个 worker 节点执行:
-
-``` sh
-kubeadm join 172.20.48.122:6443 --token oiense.zunfelisnfdksief --discovery-token-ca-cert-hash sha256:c5b613c7c6e8334df79c433e58d47c4de8b0efd042378dc4392347c57a41ff93
-```
-
-在 worker 节点 pull pause 镜像：
-``` sh
-docker pull registry.cn-hangzhou.aliyuncs.com/k8sth/pause:3.1
-docker tag registry.cn-hangzhou.aliyuncs.com/k8sth/pause:3.1 k8s.gcr.io/pause:3.1
-```
-
-3.3 在 master 节点 apply Calico 网络插件。
-
-在 master 节点查看集群情况
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155db22875f135cd.png)
-
-这是可以看到节点的 status 还是 NotReady，这是由于还没有网络插件。在 master 节点 apply Calico 网络插件.
-
-```
-kubectl apply -f Calico.yml
-```
-
-以下提供 Calico.yml 文件参考，请根据具体情况调整：
-Calico相关配置可参考[Calico Reference](https://docs.projectcalico.org/v3.1/reference/).
-
-```
-# Calico Version v3.1.3
-# https://docs.projectcalico.org/v3.1/releases#v3.1.3
-kind: ClusterRole
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: calico-node
-rules:
-  - apiGroups: [""]
-    resources:
-      - namespaces
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups: [""]
-    resources:
-      - pods/status
-    verbs:
-      - update
-  - apiGroups: [""]
-    resources:
-      - pods
-    verbs:
-      - get
-      - list
-      - watch
-      - patch
-  - apiGroups: [""]
-    resources:
-      - services
-    verbs:
-      - get
-  - apiGroups: [""]
-    resources:
-      - endpoints
-    verbs:
-      - get
-  - apiGroups: [""]
-    resources:
-      - nodes
-    verbs:
-      - get
-      - list
-      - update
-      - watch
-  - apiGroups: ["extensions"]
-    resources:
-      - networkpolicies
-    verbs:
-      - get
-      - list
-      - watch
-  - apiGroups: ["networking.k8s.io"]
-    resources:
-      - networkpolicies
-    verbs:
-      - watch
-      - list
-  - apiGroups: ["crd.projectcalico.org"]
-    resources:
-      - globalfelixconfigs
-      - felixconfigurations
-      - bgppeers
-      - globalbgpconfigs
-      - bgpconfigurations
-      - ippools
-      - globalnetworkpolicies
-      - globalnetworksets
-      - networkpolicies
-      - clusterinformations
-      - hostendpoints
-    verbs:
-      - create
-      - get
-      - list
-      - update
-      - watch
-
----
-
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: calico-node
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: calico-node
-subjects:
-- kind: ServiceAccount
-  name: calico-node
-  namespace: kube-system
-
----
-
-# Calico Version v3.1.3
-# https://docs.projectcalico.org/v3.1/releases#v3.1.3
-# This manifest includes the following component versions:
-#   calico/node:v3.1.3
-#   calico/cni:v3.1.3
-
-# This ConfigMap is used to configure a self-hosted Calico installation.
-kind: ConfigMap
-apiVersion: v1
-metadata:
-  name: calico-config
-  namespace: kube-system
-data:
-  # To enable Typha, set this to "calico-typha" *and* set a non-zero value for Typha replicas
-  # below.  We recommend using Typha if you have more than 50 nodes. Above 100 nodes it is
-  # essential.
-  typha_service_name: "none"
-
-  # The CNI network configuration to install on each node.
-  cni_network_config: |-
-    {
-      "name": "k8s-pod-network",
-      "cniVersion": "0.3.0",
-      "plugins": [
-        {
-          "type": "calico",
-          "log_level": "info",
-          "datastore_type": "kubernetes",
-          "nodename": "__KUBERNETES_NODE_NAME__",
-          "mtu": 1500,
-          "ipam": {
-            "type": "host-local",
-            "subnet": "usePodCidr"
-          },
-          "policy": {
-            "type": "k8s"
-          },
-          "kubernetes": {
-            "kubeconfig": "__KUBECONFIG_FILEPATH__"
-          }
-        },
-        {
-          "type": "portmap",
-          "snat": true,
-          "capabilities": {"portMappings": true}
-        }
-      ]
-    }
-
----
-
-# This manifest creates a Service, which will be backed by Calico's Typha daemon.
-# Typha sits in between Felix and the API server, reducing Calico's load on the API server.
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: calico-typha
-  namespace: kube-system
-  labels:
-    k8s-app: calico-typha
-spec:
-  ports:
-    - port: 5473
-      protocol: TCP
-      targetPort: calico-typha
-      name: calico-typha
-  selector:
-    k8s-app: calico-typha
-
----
-
-# This manifest creates a Deployment of Typha to back the above service.
-
-apiVersion: apps/v1beta1
-kind: Deployment
-metadata:
-  name: calico-typha
-  namespace: kube-system
-  labels:
-    k8s-app: calico-typha
-spec:
-  # Number of Typha replicas.  To enable Typha, set this to a non-zero value *and* set the
-  # typha_service_name variable in the calico-config ConfigMap above.
-  #
-  # We recommend using Typha if you have more than 50 nodes.  Above 100 nodes it is essential
-  # (when using the Kubernetes datastore).  Use one replica for every 100-200 nodes.  In
-  # production, we recommend running at least 3 replicas to reduce the impact of rolling upgrade.
-  replicas: 0
-  revisionHistoryLimit: 2
-  template:
-    metadata:
-      labels:
-        k8s-app: calico-typha
-      annotations:
-        # This, along with the CriticalAddonsOnly toleration below, marks the pod as a critical
-        # add-on, ensuring it gets priority scheduling and that its resources are reserved
-        # if it ever gets evicted.
-        scheduler.alpha.kubernetes.io/critical-pod: ''
-    spec:
-      hostNetwork: true
-      tolerations:
-        # Mark the pod as a critical add-on for rescheduling.
-        - key: CriticalAddonsOnly
-          operator: Exists
-      # Since Calico can't network a pod until Typha is up, we need to run Typha itself
-      # as a host-networked pod.
-      serviceAccountName: calico-node
-      containers:
-      - image: quay.io/calico/typha:v0.7.4
-        name: calico-typha
-        ports:
-        - containerPort: 5473
-          name: calico-typha
-          protocol: TCP
-        env:
-          # Enable "info" logging by default.  Can be set to "debug" to increase verbosity.
-          - name: TYPHA_LOGSEVERITYSCREEN
-            value: "info"
-          # Disable logging to file and syslog since those don't make sense in Kubernetes.
-          - name: TYPHA_LOGFILEPATH
-            value: "none"
-          - name: TYPHA_LOGSEVERITYSYS
-            value: "none"
-          # Monitor the Kubernetes API to find the number of running instances and rebalance
-          # connections.
-          - name: TYPHA_CONNECTIONREBALANCINGMODE
-            value: "kubernetes"
-          - name: TYPHA_DATASTORETYPE
-            value: "kubernetes"
-          - name: TYPHA_HEALTHENABLED
-            value: "true"
-          # Uncomment these lines to enable prometheus metrics.  Since Typha is host-networked,
-          # this opens a port on the host, which may need to be secured.
-          #- name: TYPHA_PROMETHEUSMETRICSENABLED
-          #  value: "true"
-          #- name: TYPHA_PROMETHEUSMETRICSPORT
-          #  value: "9093"
-        livenessProbe:
-          httpGet:
-            path: /liveness
-            port: 9098
-          periodSeconds: 30
-          initialDelaySeconds: 30
-        readinessProbe:
-          httpGet:
-            path: /readiness
-            port: 9098
-          periodSeconds: 10
-
----
-
-# This manifest installs the calico/node container, as well
-# as the Calico CNI plugins and network config on
-# each master and worker node in a Kubernetes cluster.
-kind: DaemonSet
-apiVersion: extensions/v1beta1
-metadata:
-  name: calico-node
-  namespace: kube-system
-  labels:
-    k8s-app: calico-node
-spec:
-  selector:
-    matchLabels:
-      k8s-app: calico-node
-  updateStrategy:
-    type: RollingUpdate
-    rollingUpdate:
-      maxUnavailable: 1
-  template:
-    metadata:
-      labels:
-        k8s-app: calico-node
-      annotations:
-        # This, along with the CriticalAddonsOnly toleration below,
-        # marks the pod as a critical add-on, ensuring it gets
-        # priority scheduling and that its resources are reserved
-        # if it ever gets evicted.
-        scheduler.alpha.kubernetes.io/critical-pod: ''
-    spec:
-      hostNetwork: true
-      tolerations:
-        # Make sure calico/node gets scheduled on all nodes.
-        - effect: NoSchedule
-          operator: Exists
-        # Mark the pod as a critical add-on for rescheduling.
-        - key: CriticalAddonsOnly
-          operator: Exists
-        - effect: NoExecute
-          operator: Exists
-      serviceAccountName: calico-node
-      # Minimize downtime during a rolling upgrade or deletion; tell Kubernetes to do a "force
-      # deletion": https://kubernetes.io/docs/concepts/workloads/pods/pod/#termination-of-pods.
-      terminationGracePeriodSeconds: 0
-      containers:
-        # Runs calico/node container on each Kubernetes node.  This
-        # container programs network policy and routes on each
-        # host.
-        - name: calico-node
-          image: quay.io/calico/node:v3.1.3
-          env:
-            # Use Kubernetes API as the backing datastore.
-            - name: DATASTORE_TYPE
-              value: "kubernetes"
-            # Enable felix info logging.
-            - name: FELIX_LOGSEVERITYSCREEN
-              value: "info"
-            # Cluster type to identify the deployment type
-            - name: CLUSTER_TYPE
-              value: "k8s,bgp"
-            # Disable file logging so `kubectl logs` works.
-            - name: CALICO_DISABLE_FILE_LOGGING
-              value: "true"
-            # Set Felix endpoint to host default action to ACCEPT.
-            - name: FELIX_DEFAULTENDPOINTTOHOSTACTION
-              value: "ACCEPT"
-            # Disable IPV6 on Kubernetes.
-            - name: FELIX_IPV6SUPPORT
-              value: "false"
-            # Set MTU for tunnel device used if ipip is enabled
-            - name: FELIX_IPINIPMTU
-              value: "1440"
-            # Wait for the datastore.
-            - name: WAIT_FOR_DATASTORE
-              value: "true"
-            # The default IPv4 pool to create on startup if none exists. Pod IPs will be
-            # chosen from this range. Changing this value after installation will have
-            # no effect. This should fall within `--cluster-cidr`.
-            - name: CALICO_IPV4POOL_CIDR
-              value: "10.32.0.0/12"
-            # Enable IPIP
-            - name: CALICO_IPV4POOL_IPIP
-              value: "Always"
-            # Enable IP-in-IP within Felix.
-            - name: FELIX_IPINIPENABLED
-              value: "true"
-            # Typha support: controlled by the ConfigMap.
-            - name: FELIX_TYPHAK8SSERVICENAME
-              valueFrom:
-                configMapKeyRef:
-                  name: calico-config
-                  key: typha_service_name
-            # Set based on the k8s node name.
-            - name: NODENAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-            # Auto-detect the BGP IP address.
-            - name: IP
-              value: "autodetect"
-            - name: FELIX_HEALTHENABLED
-              value: "true"
-          securityContext:
-            privileged: true
-          resources:
-            requests:
-              cpu: 250m
-          livenessProbe:
-            httpGet:
-              path: /liveness
-              port: 9099
-            periodSeconds: 10
-            initialDelaySeconds: 10
-            failureThreshold: 6
-          readinessProbe:
-            httpGet:
-              path: /readiness
-              port: 9099
-            periodSeconds: 10
-          volumeMounts:
-            - mountPath: /lib/modules
-              name: lib-modules
-              readOnly: true
-            - mountPath: /var/run/calico
-              name: var-run-calico
-              readOnly: false
-            - mountPath: /var/lib/calico
-              name: var-lib-calico
-              readOnly: false
-        # This container installs the Calico CNI binaries
-        # and CNI network config file on each node.
-        - name: install-cni
-          image: quay.io/calico/cni:v3.1.3
-          command: ["/install-cni.sh"]
-          env:
-            # Name of the CNI config file to create.
-            - name: CNI_CONF_NAME
-              value: "10-calico.conflist"
-            # The CNI network config to install on each node.
-            - name: CNI_NETWORK_CONFIG
-              valueFrom:
-                configMapKeyRef:
-                  name: calico-config
-                  key: cni_network_config
-            # Set the hostname based on the k8s node name.
-            - name: KUBERNETES_NODE_NAME
-              valueFrom:
-                fieldRef:
-                  fieldPath: spec.nodeName
-          volumeMounts:
-            - mountPath: /host/opt/cni/bin
-              name: cni-bin-dir
-            - mountPath: /host/etc/cni/net.d
-              name: cni-net-dir
-      volumes:
-        # Used by calico/node.
-        - name: lib-modules
-          hostPath:
-            path: /lib/modules
-        - name: var-run-calico
-          hostPath:
-            path: /var/run/calico
-        - name: var-lib-calico
-          hostPath:
-            path: /var/lib/calico
-        # Used to install CNI.
-        - name: cni-bin-dir
-          hostPath:
-            path: /opt/cni/bin
-        - name: cni-net-dir
-          hostPath:
-            path: /etc/cni/net.d
-
-# Create all the CustomResourceDefinitions needed for
-# Calico policy and networking mode.
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-   name: felixconfigurations.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: FelixConfiguration
-    plural: felixconfigurations
-    singular: felixconfiguration
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: bgppeers.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: BGPPeer
-    plural: bgppeers
-    singular: bgppeer
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: bgpconfigurations.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: BGPConfiguration
-    plural: bgpconfigurations
-    singular: bgpconfiguration
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: ippools.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: IPPool
-    plural: ippools
-    singular: ippool
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: hostendpoints.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: HostEndpoint
-    plural: hostendpoints
-    singular: hostendpoint
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: clusterinformations.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: ClusterInformation
-    plural: clusterinformations
-    singular: clusterinformation
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: globalnetworkpolicies.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: GlobalNetworkPolicy
-    plural: globalnetworkpolicies
-    singular: globalnetworkpolicy
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: globalnetworksets.crd.projectcalico.org
-spec:
-  scope: Cluster
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: GlobalNetworkSet
-    plural: globalnetworksets
-    singular: globalnetworkset
-
----
-
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: networkpolicies.crd.projectcalico.org
-spec:
-  scope: Namespaced
-  group: crd.projectcalico.org
-  version: v1
-  names:
-    kind: NetworkPolicy
-    plural: networkpolicies
-    singular: networkpolicy
-
----
-
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: calico-node
-  namespace: kube-system
-```
-
-等待所有的 pod 都是 running 状态，可以看到所有 node 的 status 是 running 的状态，这时 kubernetes 集群就搭建好了。
-
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155db40e446acdcb.png)
+# istio
+
+istio 是由 Google、IBM、Lyft 等共同开源的 Service Mesh（服务网格）框架，于2017年初开始进入大众视野。Kubernetes 解决了云原生应用的部署问题，istio 解决的是应用的服务（流量）治理问题。随着 2018年7月31日 istio 1.0 发布，istio 本身已经日趋稳定
+
+
+https://istio.io/zh/docs/concepts/what-is-istio/
+
+解决微服务中的服务发现、负载均衡、故障恢复、指标收集和监控，构建网格服务，进行服务治理及流量控制等
+
+Istio:
+* 数据平面
+* 控制平面
+* Envoy
+* Mixer
+* Pilot
+* Citadel
+
+Istio Tasks:
+* 流量管理
+* * Gateway
+* * VirtualService
+* * DestinationRule
+* * ServiceEntry
+* * Policy
+* 安全
+* * ServiceRole
+* * ServiceRoleBinding
+* * Policy
+* 策略
+* * memquota
+* * quota
+* * rule
+* * QuotaSpec
+* * QuotaSpecBinding
+* * listchecker
+* * listentry
+* * rule
+* 遥测
+* * zipkin
+* * jaeger
+* * servicegraph
+* * prometheus
+
+### K8s 须知
+* 某些服务是固定到特定机器上的
+* * Easticsearch
+* * Prometheus
+* Pod基本是三种类型配置启动的
+* * Deployment
+* * Statefulset
+* * Daemonset
+* 服务配置文件尽量用Configmap的方式配置在K8s中，尽量少采用文件挂载
+* 服务数据需要持久化存储的，用PersistentVolume持久化出来
+* 主体服务应该都要配置健康检查和资源限制
+
+
+### Istio 须知
+* 添加域名需要配置Gateway
+* 子服务解析需要配置VirtualService
+* 服务之间访问通过服务名称访问
+* 外部服务访问需要配置ServiceEntry
+
+### Istio 是什么?
+使用云平台可以为组织提供丰富的好处。然而，不可否认的是，采用云可能会给 DevOps 团队带来压力。开发人员必须使用微服务已满足应用的可移植性，同时运营商管理了极其庞大的混合和多云部署。Istio 允许您连接、保护、控制和观测服务。
+
+在较高的层次上，Istio 有助于降低这些部署的复杂性，并减轻开发团队的压力。它是一个完全开源的服务网格，可以透明地分层到现有的分布式应用程序上。它也是一个平台，包括允许它集成到任何日志记录平台、遥测或策略系统的 API。Istio 的多样化功能集使您能够成功高效地运行分布式微服务架构，并提供保护、连接和监控微服务的统一方法。
+
+### 什么是服务网格？
+在从单体应用程序向分布式微服务架构的转型过程中，开发人员和运维人员面临诸多挑战，使用 Istio 可以解决这些问题。
+
+服务网格（Service Mesh）这个术语通常用于描述构成这些应用程序的微服务网络以及应用之间的交互。随着规模和复杂性的增长，服务网格越来越难以理解和管理。它的需求包括服务发现、负载均衡、故障恢复、指标收集和监控以及通常更加复杂的运维需求，例如 A/B 测试、金丝雀发布、限流、访问控制和端到端认证等。
+
+Istio 提供了一个完整的解决方案，通过为整个服务网格提供行为洞察和操作控制来满足微服务应用程序的多样化需求。
+
+### 为什么要使用 Istio？
+Istio 提供一种简单的方式来为已部署的服务建立网络，该网络具有负载均衡、服务间认证、监控等功能，而不需要对服务的代码做任何改动。想要让服务支持 Istio，只需要在您的环境中部署一个特殊的 sidecar 代理，使用 Istio 控制平面功能配置和管理代理，拦截微服务之间的所有网络通信：
+
+HTTP、gRPC、WebSocket 和 TCP 流量的自动负载均衡。
+通过丰富的路由规则、重试、故障转移和故障注入，可以对流量行为进行细粒度控制。
+可插入的策略层和配置 API，支持访问控制、速率限制和配额。
+对出入集群入口和出口中所有流量的自动度量指标、日志记录和跟踪。
+通过强大的基于身份的验证和授权，在集群中实现安全的服务间通信。
+Istio 旨在实现可扩展性，满足各种部署需求。
+
+### 核心功能
+Istio 在服务网络中统一提供了许多关键功能：
+
+#### 流量管理
+通过简单的规则配置和流量路由，您可以控制服务之间的流量和 API 调用。Istio 简化了断路器、超时和重试等服务级别属性的配置，并且可以轻松设置 A/B测试、金丝雀部署和基于百分比的流量分割的分阶段部署等重要任务。
+
+通过更好地了解您的流量和开箱即用的故障恢复功能，您可以在问题出现之前先发现问题，使调用更可靠，并且使您的网络更加强大——无论您面临什么条件。
+
+#### 安全
+Istio 的安全功能使开发人员可以专注于应用程序级别的安全性。Istio 提供底层安全通信信道，并大规模管理服务通信的认证、授权和加密。使用Istio，服务通信在默认情况下是安全的，它允许您跨多种协议和运行时一致地实施策略——所有这些都很少或根本不需要应用程序更改。
+
+虽然 Istio 与平台无关，但将其与 Kubernetes（或基础架构）网络策略结合使用，其优势会更大，包括在网络和应用层保护 pod 间或服务间通信的能力。
+
+#### 可观察性
+Istio 强大的跟踪、监控和日志记录可让您深入了解服务网格部署。通过 Istio 的监控功能，可以真正了解服务性能如何影响上游和下游的功能，而其自定义仪表板可以提供对所有服务性能的可视性，并让您了解该性能如何影响您的其他进程。
+
+Istio 的 Mixer 组件负责策略控制和遥测收集。它提供后端抽象和中介，将 Istio 的其余部分与各个基础架构后端的实现细节隔离开来，并为运维提供对网格和基础架构后端之间所有交互的细粒度控制。
+
+所有这些功能可以让您可以更有效地设置、监控和实施服务上的 SLO。当然，最重要的是，您可以快速有效地检测和修复问题。
+
+#### 平台支持
+Istio 是独立于平台的，旨在运行在各种环境中，包括跨云、内部部署、Kubernetes、Mesos 等。您可以在 Kubernetes 上部署 Istio 或具有 Consul 的 Nomad 上部署。Istio 目前支持：
+
+在 Kubernetes 上部署的服务
+使用 Consul 注册的服务
+在虚拟机上部署的服务
+集成和定制
+策略执行组件可以扩展和定制，以便与现有的 ACL、日志、监控、配额、审计等方案集成。
+
+### 架构
+Istio 服务网格逻辑上分为数据平面和控制平面。
+
+数据平面由一组以 sidecar 方式部署的智能代理（Envoy）组成。这些代理可以调节和控制微服务及 Mixer 之间所有的网络通信。
+控制平面负责管理和配置代理来路由流量。此外控制平面配置 Mixer 以实施策略和收集遥测数据。
+下图显示了构成每个面板的不同组件：
+
+![](http://132.232.81.57:8181/uploads/blog/201810/attach_156073d91844126f.png)
+
+基于 Istio 的应用程序架构概览
+Istio 架构
+### Envoy
+Istio 使用 Envoy 代理的扩展版本，Envoy 是以 C++ 开发的高性能代理，用于调解服务网格中所有服务的所有入站和出站流量。Envoy 的许多内置功能被 istio 发扬光大，例如：
+
+动态服务发现
+负载均衡
+TLS 终止
+HTTP/2 & gRPC 代理
+熔断器
+健康检查、基于百分比流量拆分的灰度发布
+故障注入
+丰富的度量指标
+Envoy 被部署为 sidecar，和对应服务在同一个 Kubernetes pod 中。这允许 Istio 将大量关于流量行为的信号作为属性提取出来，而这些属性又可以在 Mixer 中用于执行策略决策，并发送给监控系统，以提供整个网格行为的信息。
+
+Sidecar 代理模型还可以将 Istio 的功能添加到现有部署中，而无需重新构建或重写代码。可以阅读更多来了解为什么我们在设计目标中选择这种方式。
+
+### Mixer
+Mixer 是一个独立于平台的组件，负责在服务网格上执行访问控制和使用策略，并从 Envoy 代理和其他服务收集遥测数据。代理提取请求级属性，发送到 Mixer 进行评估。有关属性提取和策略评估的更多信息，请参见 Mixer 配置。
+
+Mixer 中包括一个灵活的插件模型，使其能够接入到各种主机环境和基础设施后端，从这些细节中抽象出 Envoy 代理和 Istio 管理的服务。
+
+### Pilot
+Pilot 为 Envoy sidecar 提供服务发现功能，为智能路由（例如 A/B 测试、金丝雀部署等）和弹性（超时、重试、熔断器等）提供流量管理功能。它将控制流量行为的高级路由规则转换为特定于 Envoy 的配置，并在运行时将它们传播到 sidecar。
+
+Pilot 将平台特定的服务发现机制抽象化并将其合成为符合 Envoy 数据平面 API 的任何 sidecar 都可以使用的标准格式。这种松散耦合使得 Istio 能够在多种环境下运行（例如，Kubernetes、Consul、Nomad），同时保持用于流量管理的相同操作界面。
+
+### Citadel
+Citadel 通过内置身份和凭证管理可以提供强大的服务间和最终用户身份验证。可用于升级服务网格中未加密的流量，并为运维人员提供基于服务标识而不是网络控制的强制执行策略的能力。从 0.5 版本开始，Istio 支持基于角色的访问控制，以控制谁可以访问您的服务。
+
+### 设计目标
+Istio 的架构设计中有几个关键目标，这些目标对于使系统能够应对大规模流量和高性能地服务处理至关重要。
+
+最大化透明度：若想 Istio 被采纳，应该让运维和开发人员只需付出很少的代价就可以从中受益。为此，Istio 将自身自动注入到服务间所有的网络路径中。Istio 使用 sidecar 代理来捕获流量，并且在尽可能的地方自动编程网络层，以路由流量通过这些代理，而无需对已部署的应用程序代码进行任何改动。在 Kubernetes中，代理被注入到 pod 中，通过编写 iptables 规则来捕获流量。注入 sidecar 代理到 pod 中并且修改路由规则后，Istio 就能够调解所有流量。这个原则也适用于性能。当将 Istio 应用于部署时，运维人员可以发现，为提供这些功能而增加的资源开销是很小的。所有组件和 API 在设计时都必须考虑性能和规模。
+
+增量：随着运维人员和开发人员越来越依赖 Istio 提供的功能，系统必然和他们的需求一起成长。虽然我们期望继续自己添加新功能，但是我们预计最大的需求是扩展策略系统，集成其他策略和控制来源，并将网格行为信号传播到其他系统进行分析。策略运行时支持标准扩展机制以便插入到其他服务中。此外，它允许扩展词汇表，以允许基于网格生成的新信号来执行策略。
+
+可移植性：使用 Istio 的生态系统将在很多维度上有差异。Istio 必须能够以最少的代价运行在任何云或预置环境中。将基于 Istio 的服务移植到新环境应该是轻而易举的，而使用 Istio 将一个服务同时部署到多个环境中也是可行的（例如，在多个云上进行冗余部署）。
+
+策略一致性：在服务间的 API 调用中，策略的应用使得可以对网格间行为进行全面的控制，但对于无需在 API 级别表达的资源来说，对资源应用策略也同样重要。例如，将配额应用到 ML 训练任务消耗的 CPU 数量上，比将配额应用到启动这个工作的调用上更为有用。因此，策略系统作为独特的服务来维护，具有自己的 API，而不是将其放到代理/sidecar 中，这容许服务根据需要直接与其集成。
+
 
 ## 4. 安装 istio
 
@@ -3266,7 +2706,7 @@ metadata:
 spec:
   type: LoadBalancer
   externalIPs:
-    - 172.20.48.122
+    - 172.20.249.16
   selector:
     app: istio-ingressgateway
     istio: ingressgateway
@@ -5929,7 +5369,7 @@ spec:
 
 查看 istio 的 pods 都处于 running 的状态
 
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155dc41a86b305d3.png)
+![](http://172.20.249.231:8181/uploads/blog/201810/attach_155dc41a86b305d3.png)
 
 4.3 apply istio 监控和日志相关 gateway 文件：
 
@@ -6096,12 +5536,12 @@ spec:
 改 hosts 文件 (ip 设为 master 的 ip)，访问 istio 相关监控服务：
 
 ```
-172.20.48.122  grafana.vivodms.com
-172.20.48.122  jaeger.vivodms.com
-172.20.48.122  servicegraph.vivodms.com
-172.20.48.122  prometheus.vivodms.com
+172.20.249.16  grafana.vivodms.com
+172.20.249.16  jaeger.vivodms.com
+172.20.249.16  servicegraph.vivodms.com
+172.20.249.16  prometheus.vivodms.com
 ```
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155dc5a47c043305.png)
+![](http://172.20.249.231:8181/uploads/blog/201810/attach_155dc5a47c043305.png)
 
 
 ## 5. 安装 istio bookinfo 的 demo (https://istio.io/docs/examples/bookinfo/)
@@ -6161,7 +5601,7 @@ spec:
           number: 9080
 
 ```
-![](http://172.20.48.231:8181/uploads/blog/201810/attach_155dc5ec1847c688.png)
+![](http://172.20.249.231:8181/uploads/blog/201810/attach_155dc5ec1847c688.png)
 
 
 这是一个很简单的demo， 将bookinfo的前端部分，打包成镜像，然后部署。
