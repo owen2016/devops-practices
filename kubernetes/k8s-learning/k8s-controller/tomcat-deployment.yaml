@@ -1,24 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: frontend
+  name: tomcat-deployment
+  labels:
+    app: tomcat
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
-      tier: frontend
+      app: tomcat
     matchExpressions:
-      - {key: tier, operator: In, values: [frontend]}
+      - {key: app, operator: In, values: [tomcat]}
   template:
     metadata:
       labels:
-        app: app-demo
-        tier: frontend
+        app: tomcat
     spec:
       containers:
       - name: tomcat-demo
         image: tomcat
-# 设置资源限额，CPU通常以千分之一的CPU配额为最小单位，用m来表示。通常一个容器的CPU配额被定义为100~300m，即占用0.1~0.3个CPU；
+        # 设置资源限额，CPU通常以千分之一的CPU配额为最小单位，用m来表示。通常一个容器的CPU配额被定义为100~300m，即占用0.1~0.3个CPU；
         resources:
           requests:
             memory: "64Mi"
