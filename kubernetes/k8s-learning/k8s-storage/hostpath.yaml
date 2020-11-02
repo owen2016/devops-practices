@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod2
+spec:
+  containers:
+  - image: busybox
+    name: test-hostpath
+    command: [ "sleep", "3600" ]
+    volumeMounts:
+    - mountPath: /test-data
+      name: test-volume
+  volumes:
+  - name: test-volume
+    hostPath: 
+      # directory location on host
+      path: /data
+      # this field is optional
+      type: Directory
