@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: nfs-pod
+spec:
+  containers:
+    - name: web
+      image: nginx
+      ports:
+        - name: web
+          containerPort: 80
+      volumeMounts:
+        - name : nfs        #指定名称必须与下面一致
+          mountPath: /usr/share/nginx/html #容器内的挂载点
+  volumes:
+    - name: nfs  #指定名称必须与上面一致
+      nfs:            #nfs存储
+        server: 172.20.249.5        #nfs服务器ip或是域名
+        path: /var/nfs/sharedir     #nfs服务器共享的目录

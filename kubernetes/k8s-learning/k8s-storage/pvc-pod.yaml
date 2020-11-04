@@ -1,0 +1,69 @@
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-pv001
+  labels: # 这些labels可以不定义
+    name: nfs-pv001
+    storetype: nfs
+spec:       # 这里的spec和volumes里面的一样
+  storageClassName: normal
+  accessModes:  # 设置访问模型
+    - ReadWriteMany
+    - ReadWriteOnce
+    - ReadOnlyMany
+  capacity: # 设置存储空间大小
+    storage: 500Mi
+  persistentVolumeReclaimPolicy: Retain  # 回收策略
+  nfs:
+    server: 172.20.249.5
+    path: /var/nfs/sharedir
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: nfs-pvc001
+  namespace: default
+  labels: # 这些labels可以不定义
+    name: nfs-pvc001
+    storetype: nfs
+    capacity: 500Mi
+spec:
+  storageClassName: normal
+  accessModes:  # PVC也需要定义访问模式，不过它的模式一定是和现有PV相同或者是它的子集，否则匹配不到PV
+  - ReadWriteMany
+  resources: # 定义资源要求PV满足这个PVC的要求才会被匹配到
+    requests:
+      storage: 500Mi  # 定义要求有多大空间
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tomcat-deploy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      appname: myapp
+  template:
+    metadata:
+      name: myapp
+      labels:
+        appname: myapp
+    spec:
+      containers:
+      - name: myapp
+        image: tomcat:8.5.38-jre8
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        volumeMounts:
+          - name: tomcatedata
+            mountPath : "/data"
+      volumes:
+        - name: tomcatedata
+          persistentVolumeClaim:
+            claimName: nfs-pvc001
