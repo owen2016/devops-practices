@@ -1,0 +1,70 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myredis2
+spec:
+  replicas: 1
+  selector:
+   app: myredis2
+  template:
+   metadata:
+     labels:
+       app: myredis2
+   spec:
+     containers:
+     - name: myredis2
+       image: 10.0.0.10:5000/test/redis3.2.6
+       resources:
+         limits:
+           memory: 1024M   #分配内存大小
+           cpu: '1'        #分配cpu数量
+       ports:
+         - containerPort: 6379
+       env:
+         - name: REDIS_AUTH_PASSWORD  #设置redis的密码
+           value: NewtouchOne123
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: redis1
+  labels:
+    name: redis1
+spec:
+  containers:
+  - name: redis1
+    image: redis
+    ports:
+    - containerPort: 6379
+      hostPort: 6380
+
+---
+#redis数据持久化
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: myredis1
+spec:
+  replicas: 1
+  selector:
+   app: myredis1
+  template:
+   metadata:
+     labels:
+       app: myredis1
+   spec:
+     containers:
+     - name: myredis1
+       image: 10.0.0.10:5000/redis       
+       ports:
+       - containerPort: 6379
+       volumeMounts:
+       - mountPath: /var/lib
+         name: redis-data
+     volumes:
+      - hostPath:
+         path: /data
+        name: redis-data
+
+---

@@ -1,0 +1,22 @@
+# This is My first Dockerfile
+# Version 1.0
+# Author: ljx
+# Base images
+FROM centos:6.9
+# MAINTAINER
+
+# ADD
+ADD redis-3.2.6.tar.gz /usr/local
+
+#RUN
+RUN yum -y install wget gcc gcc-c++ make vim
+
+#WORKDIR
+WORKDIR /usr/local/redis-3.2.6
+RUN make
+ADD redis.conf /etc/redis.conf
+RUN ln -s /usr/local/redis-3.2.6/src/redis-cli /usr/bin/redis-cli
+EXPOSE 6379
+ENTRYPOINT [ "/usr/local/redis-3.2.6/src/redis-server","/etc/redis.conf"]
+
+# 注意：redis.conf 需要redis源文件解压后复制到/etc目录下，自己创建的（redis.conf）文件不能启动redis服务器

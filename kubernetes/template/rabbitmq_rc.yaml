@@ -1,0 +1,26 @@
+apiVersion: extensions/v1beta1
+#kind: Deployment
+kind: ReplicationController
+metadata:
+  name: rabbitmq
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: rabbitmq
+    spec:
+      hostname: rabbitmq
+      containers:
+        - name: rabbitmq
+          image: rabbitmq
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 5672
+            - containerPort: 15672
+          env:
+            - name: RABBITMQ_PASS
+              value: admin
+      nodeSelector:
+        FUN: "SERVICE"

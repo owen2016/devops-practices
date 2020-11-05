@@ -1,0 +1,14 @@
+FROM centos:6.9
+ENV REFRESHED_AT 2018-07-21
+WORKDIR /usr/local
+RUN mkdir jdk
+RUN mkdir tomcat
+ADD jdk1.6.0_24.tar.gz /usr/local/jdk
+ADD apache-tomcat-7.0.90.tar.gz /usr/local/tomcat
+ENV JAVA_HOME=/usr/local/jdk/jdk1.6.0_24
+ENV JRE_HOME=$JAVA_HOME/jre
+ENV CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JRE_HOME/lib:$CLASSPATH
+ENV PATH=/sbin:$JAVA_HOME/bin:$PATH
+RUN chmod +x /usr/local/tomcat/apache-tomcat-7.0.90/bin/catalina.sh
+EXPOSE 8080
+ENTRYPOINT ["/usr/local/tomcat/apache-tomcat-7.0.90/bin/catalina.sh","run"]

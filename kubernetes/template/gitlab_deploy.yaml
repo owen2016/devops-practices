@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: default
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      hostname: gitlab
+      containers:
+        - name: gitlab
+          image: gitlab-ce
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+      nodeSelector:
+        FUN: "SERVICE"

@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: ReplicationController
+metadata:
+  name: zookeeper-test
+spec:
+   replicas: 1
+   selector:
+     app: zookeeper-test
+   template:
+     metadata:
+       labels:
+         app: zookeeper-test
+     spec:
+       containers:
+       - name: zookeeper-test
+         image: 192.168.1.201:5000/zookeeper
+         ports:
+         - containerPort: 2181
+         ports:
+         - containerPort: 2888
