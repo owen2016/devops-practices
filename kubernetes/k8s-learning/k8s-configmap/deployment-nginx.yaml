@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-nginx
+spec:
+  replicas: 1
+  selector:
+    matchLabels: 
+     app: my-nginx
+  template:
+    metadata:
+      labels:
+        app: my-nginx
+    spec:
+      containers:
+      - name: my-nginx
+        image: nginx
+        ports:
+        - containerPort: 8081
+        volumeMounts:                        # --就是这一段使用configMap配置
+        - mountPath: /etc/nginx/conf.d  #--将配置文件挂载到哪里
+          name: config
+      volumes:
+        - name: config                          # --指定config使用configMap
+          configMap:
+            name: nginx-config               # --指定使用configMap中的nginx-config配置
+            items:                        # --注：也可不指定items，那默认是nginx-config里的所有值都挂载
+            - key: nginx.conf              # --使用nginx-config配置的nginx.conf键里的内容
+              path: nginx.conf
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nginx-svc
+spec:
+  type: NodePort
+  selector:
+    app: my-nginx
+  ports:
+    - protocol: TCP
+      port: 8081
+      targetPort: 8081
+      nodePort: 30080

@@ -1,0 +1,29 @@
+#>>>>>create configmap firstly<<<<<< 
+#kubectl create configmap special-config --from-literal=special.how=very --from-literal=special.type=charm 
+#kubectl create configmap env-config --from-literal=log_level=INFO
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: test-pod
+spec:
+  containers:
+    - name: test-container
+      image: busybox
+      command: [ "/bin/sh", "-c", "env;sleep 36000" ]
+      env:
+        - name: SPECIAL_LEVEL_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: special-config
+              key: special.how
+        - name: SPECIAL_TYPE_KEY
+          valueFrom:
+            configMapKeyRef:
+              name: special-config
+              key: special.type
+      envFrom:
+        - configMapRef:
+            name: env-config
+  restartPolicy: Never

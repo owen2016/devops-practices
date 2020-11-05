@@ -1,0 +1,16 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: cm-nginx
+  namespace: default
+data:
+  nginx-c: "server {
+    listen 80;
+    listen [::]:80;
+    server_name example.com;
+    root /var/www/example.com;
+    index index.html;
+    location / {
+    try_files $uri $uri/ =404;
+    }
+}"
