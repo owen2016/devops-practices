@@ -1,0 +1,68 @@
+# apiVersion: v1
+# kind: PersistentVolume
+# metadata:  # PV建立不要加名称空间，因为PV属于集群级别的
+#   name: nfs-pv001  # PV名称
+#   labels: # 这些labels可以不定义
+#     name: nfs-pv001
+#     storetype: nfs
+# spec:  # 这里的spec和volumes里面的一样
+#   storageClassName: standard
+#   accessModes:  # 设置访问模型
+#     - ReadWriteMany
+#     - ReadWriteOnce
+#     - ReadOnlyMany
+#   capacity: # 设置存储空间大小
+#     storage: 2Gi
+#   persistentVolumeReclaimPolicy: Retain # 回收策略
+#   nfs:
+#     server: 172.20.249.5
+#     path: /var/nfs/sharedir
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: headless-svc
+spec:
+  clusterIP: None       # 这是一个Headless Service
+  ports:
+  - port: 80
+  selector:
+    app: nginx
+
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ngx-statefulset
+spec:
+  serviceName: headless-svc         # 使用这个Headless Service来保证
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:latest
+        ports:
+        - name: web-service
+          containerPort: 80
+        volumeMounts:
+          - name: mypvc
+            mountPath: /usr/share/nginx/html
+  volumeClaimTemplates:    # PVC模板,作用类似于Pod模板, 用于创建PVC
+  - metadata:
+      name: mypvc
+    spec:
+      storageClassName: standard
+      accessModes:
+      - ReadWriteMany
+      resources:
+        requests:
+          storage: 1Gi
