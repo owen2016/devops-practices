@@ -1,0 +1,23 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elkhost
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: elkhost
+  template:
+    metadata:
+      labels:
+        name: elkhost
+    spec:
+     containers:
+     - name: elkhost
+       image: sebp/elk:622
+       tty: true
+       ports: [{
+          "containerPort": 5601 # 暴露了两个端口：kibana的5601和logstash的5044；
+        },{
+         "containerPort": 5044
+        }]

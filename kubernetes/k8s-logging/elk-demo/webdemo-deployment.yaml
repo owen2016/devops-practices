@@ -1,0 +1,20 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elkwebdemo
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+       name: elkwebdemo
+  template:
+    metadata:
+      labels:
+         name: elkwebdemo
+    spec:
+     containers:
+      - name: elkwebdemo
+        image: bolingcavalry/elkdemo:0.0.1-SNAPSHOT
+        tty: true
+        ports:
+         - containerPort: 8080

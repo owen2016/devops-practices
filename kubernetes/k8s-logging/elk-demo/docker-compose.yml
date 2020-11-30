@@ -1,0 +1,16 @@
+version: '2'
+services:
+  elk:
+    image: sebp/elk:622
+    ports:
+      - "5602:5601"
+    restart: always
+  webapp:
+    image: bolingcavalry/elkdemo:0.0.1-SNAPSHOT
+    depends_on:
+      - elk
+    links:
+      - elk:elkhost
+    ports:
+      - "18080:8080"
+    restart: always
