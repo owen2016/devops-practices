@@ -1,2 +1,14 @@
 shell/ssh/info.log
 *.retry
+docker/base-python/buildImage.sh
+docker/base-python/Dockerfile
+docker/base-python/README.md
+docker/base-python/conf/pip.conf
+docker/base-tomcat/buildImage.sh
+docker/base-tomcat/Dockerfile
+docker/base-tomcat/README.md
+docker/base-tomcat/bin/catalina.sh
+docker/base-tomcat/conf/logging.properties
+docker/base-tomcat/conf/server.xml
+docker/base-tomcat/my_init.d/01_replaceConfig.sh
+docker/base-tomcat/service/tomcat/run
