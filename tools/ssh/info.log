@@ -1,0 +1,14 @@
+[2020-07-12,15:56:51] - ssh-keygen command is available.
+[2020-07-12,15:56:51] - ssh-keygen success
+[2020-07-12,15:57:54] - ssh-keygen command is available.
+[2020-07-12,15:57:54] - ssh-keygen success
+[2020-07-12,15:57:56] - ssh-copy-id to server 192.168.31.11 success.
+[2020-07-12,15:57:56] - ssh-copy-id to server 192.168.31.22 success.
+[2020-07-12,18:23:43] - ssh-keygen command is available.
+[2020-07-12,18:23:43] - ssh-keygen success
+[2020-07-12,18:23:43] - ssh-copy-id to server 192.168.31.11 success.
+[2020-07-12,18:23:44] - ssh-copy-id to server 192.168.31.22 success.
+[2020-07-12,18:26:24] - ssh-keygen command is available.
+[2020-07-12,18:26:24] - ssh-keygen success
+[2020-07-12,18:26:24] - ssh-copy-id to server 192.168.31.11 success.
+[2020-07-12,18:26:25] - ssh-copy-id to server 192.168.31.22 success.

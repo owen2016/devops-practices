@@ -1,0 +1,72 @@
+root@ecs-ubuntu18:/home/user/acme.sh# ./acme.sh  --issue  -d devopsing.site -d www.devopsing.site  --webroot  /var/www/html/blog/
+[Wed Dec 16 12:33:56 CST 2020] Using CA: https://acme-v02.api.letsencrypt.org/directory
+[Wed Dec 16 12:33:57 CST 2020] Create account key ok.
+[Wed Dec 16 12:33:57 CST 2020] Registering account: https://acme-v02.api.letsencrypt.org/directory
+[Wed Dec 16 12:33:59 CST 2020] Registered
+[Wed Dec 16 12:33:59 CST 2020] ACCOUNT_THUMBPRINT='rsbXF2h4-VBg6tkoXiWHQNYRZzERe9Qk70qSIvsu028'
+[Wed Dec 16 12:33:59 CST 2020] Creating domain key
+[Wed Dec 16 12:33:59 CST 2020] The domain key is here: /root/.acme.sh/devopsing.site/devopsing.site.key
+[Wed Dec 16 12:33:59 CST 2020] Multi domain='DNS:devopsing.site,DNS:www.devopsing.site'
+[Wed Dec 16 12:33:59 CST 2020] Getting domain auth token for each domain
+[Wed Dec 16 12:34:03 CST 2020] Getting webroot for domain='devopsing.site'
+[Wed Dec 16 12:34:03 CST 2020] Getting webroot for domain='www.devopsing.site'
+[Wed Dec 16 12:34:03 CST 2020] Verifying: devopsing.site
+[Wed Dec 16 12:34:08 CST 2020] Success
+[Wed Dec 16 12:34:08 CST 2020] Verifying: www.devopsing.site
+[Wed Dec 16 12:34:12 CST 2020] Success
+[Wed Dec 16 12:34:12 CST 2020] Verify finished, start to sign.
+[Wed Dec 16 12:34:12 CST 2020] Lets finalize the order.
+[Wed Dec 16 12:34:12 CST 2020] Le_OrderFinalize='https://acme-v02.api.letsencrypt.org/acme/finalize/106492827/6767766596'
+[Wed Dec 16 12:34:14 CST 2020] Downloading cert.
+[Wed Dec 16 12:34:14 CST 2020] Le_LinkCert='https://acme-v02.api.letsencrypt.org/acme/cert/035f179221942a9a001b5b2a17787a2426cb'
+[Wed Dec 16 12:34:15 CST 2020] Cert success.
+-----BEGIN CERTIFICATE-----
+MIIFNTCCBB2gAwIBAgISA18XkiGUKpoAG1sqF3h6JCbLMA0GCSqGSIb3DQEBCwUA
+MDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQD
+EwJSMzAeFw0yMDEyMTYwMzM0MTNaFw0yMTAzMTYwMzM0MTNaMBkxFzAVBgNVBAMT
+DmRldm9wc2luZy5zaXRlMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+ygpo/jJWjwIjXH30kdOqfxhRxQ+jDVtnn7Z9AtwbD00iOsIZ+h8hXIDC4YH+jhCV
+BUIXWZg+sAZbbdDfagVdFuXpAimxI97W7rv3Znt4K22r+mAyvA1RmoUXzFQctYy2
+bJXUWT5KZkE0zcOg6JjKQJhwANSxofVmMj3L1/l0BIdVPOEuZyg0c/O9zHeRpDy4
+MKkg7g9w1zdZP7i4rgZ2OCfV1/UlklDurrWnDtwyRp3unC6LEqYDyI8IQB35m6iM
+0hC5rjZR+BSxQc12kLyQ2lmCqaa5zDrJgBiirOgFFzUoxbi647ZE8rLPaiiMUlFk
+QBs8WKb3N/FHIRCmDrIq6wIDAQABo4ICXDCCAlgwDgYDVR0PAQH/BAQDAgWgMB0G
+A1UdJQQWMBQGCCsGAQUFBwMBBggrBgEFBQcDAjAMBgNVHRMBAf8EAjAAMB0GA1Ud
+DgQWBBRJ62ndzrp2jdl2BnCygT5B+R472zAfBgNVHSMEGDAWgBQULrMXt1hWy65Q
+CUDmH6+dixTCxjBVBggrBgEFBQcBAQRJMEcwIQYIKwYBBQUHMAGGFWh0dHA6Ly9y
+My5vLmxlbmNyLm9yZzAiBggrBgEFBQcwAoYWaHR0cDovL3IzLmkubGVuY3Iub3Jn
+LzAtBgNVHREEJjAkgg5kZXZvcHNpbmcuc2l0ZYISd3d3LmRldm9wc2luZy5zaXRl
+MEwGA1UdIARFMEMwCAYGZ4EMAQIBMDcGCysGAQQBgt8TAQEBMCgwJgYIKwYBBQUH
+AgEWGmh0dHA6Ly9jcHMubGV0c2VuY3J5cHQub3JnMIIBAwYKKwYBBAHWeQIEAgSB
+9ASB8QDvAHUAXNxDkv7mq0VEsV6a1FbmEDf71fpH3KFzlLJe5vbHDsoAAAF2adPA
+ywAABAMARjBEAiBlY6/6QoL+abKZgRV/UbyGsSKH0aHg7xtrWv65jEGOBwIgRDKu
+4zoiB5UohNBB0iUHNBtm8e9pbBDRzYnpluwDXGkAdgD2XJQv0XcwIhRUGAgwlFaO
+400TGTO/3wwvIAvMTvFk4wAAAXZp08DHAAAEAwBHMEUCIAPeJWKJ8ntZhKOY0Ufu
+cN2O4YuvBWYNXcW02R1Z/oF3AiEAwXNEraj055FcuxaAcEL2hUtqXND2BKWMm8Fu
+9o6Y2FgwDQYJKoZIhvcNAQELBQADggEBAE2C1F2riSFOpA04ZKbcKuF01SQ5NOiU
+sjOzZXp9XIBnPhfH7LiIzjDXc8veYWqMgzgQCV0YLcwlCpZW/VOcIwHVIKJgBU2U
+V53HvRFdMfppH+1AMkeBN4myPya+i55VdCJFvSDCWZ0O92yGYRiQij+jVPugNHZh
+7K5zzizu4yCnHulA+4EH4rcHA8BQ5y4yWZ9iU0rqxzn2Gcd0KMdY/5ghSJtWhMOr
+xfGlrRa9p/R7mAq+0KGUgPLZadxhC/xLU0lOV+/OKSIiEy2LzA/8ij5gfFbPZh8F
+teiGUAJMcPBEi0+qeSQXto4R7FzggZvCuOeaFJWC23kfqA6gyFMgIcw=
+-----END CERTIFICATE-----
+[Wed Dec 16 12:34:15 CST 2020] Your cert is in  /root/.acme.sh/devopsing.site/devopsing.site.cer
+[Wed Dec 16 12:34:15 CST 2020] Your cert key is in  /root/.acme.sh/devopsing.site/devopsing.site.key
+[Wed Dec 16 12:34:15 CST 2020] The intermediate CA cert is in  /root/.acme.sh/devopsing.site/ca.cer
+[Wed Dec 16 12:34:15 CST 2020] And the full chain certs is there:  /root/.acme.sh/devopsing.site/fullchain.cer
+
+
+    ssl on;
+    ssl_certificate      "/root/.acme.sh/devopsing.site/devopsing.site.cer";
+    ssl_certificate_key  "/root/.acme.sh/devopsing.site/devopsing.site.key";
+    ssl_ciphers "EECDH+AESGCM:EDH+AESGCM:AES256+EECDH:AES256+EDH:ECDHE-RSA-AES128-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA128:DHE-RSA-AES128-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES128-GCM-SHA128:ECDHE-RSA-AES128-SHA384:ECDHE-RSA-AES128-SHA128:ECDHE-RSA-AES128-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA128:DHE-RSA-AES128-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES128-GCM-SHA384:AES128-GCM-SHA128:AES128-SHA128:AES128-SHA128:AES128-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4";
+    ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+    ssl_prefer_server_ciphers on;
+    ssl_session_cache shared:SSL:10m;
+    add_header X-Content-Type-Options nosniff;
+    ssl_stapling on;
+    ssl_stapling_verify on;
+
+
+
+curl: (51) SSL: no alternative certificate subject name matches target host name 'test.devopsing.site'

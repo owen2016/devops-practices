@@ -1,0 +1,5 @@
+root@ecs-ubuntu18:/home/user/acme.sh# ./acme.sh --installcert -d *.devopsing.site --key-file /etc/nginx/ssl/*.devopsing.site.key --fullchain-file /etc/nginx/ssl/fullchain.cer --reloadcmd "service nginx force-reload"
+[Wed Dec 16 16:35:52 CST 2020] Installing key to:/etc/nginx/ssl/*.devopsing.site.key
+[Wed Dec 16 16:35:52 CST 2020] Installing full chain to:/etc/nginx/ssl/fullchain.cer
+[Wed Dec 16 16:35:52 CST 2020] Run reload cmd: service nginx force-reload
+[Wed Dec 16 16:35:52 CST 2020] Reload success

@@ -1,0 +1,70 @@
+
+root@ecs-ubuntu18:/home/user/acme.sh# ./acme.sh --issue -d *.devopsing.site  --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please
+[Wed Dec 16 16:04:43 CST 2020] Using CA: https://acme-v02.api.letsencrypt.org/directory
+[Wed Dec 16 16:04:43 CST 2020] Creating domain key
+[Wed Dec 16 16:04:43 CST 2020] The domain key is here: /root/.acme.sh/*.devopsing.site/*.devopsing.site.key
+[Wed Dec 16 16:04:43 CST 2020] Single domain='*.devopsing.site'
+[Wed Dec 16 16:04:43 CST 2020] Getting domain auth token for each domain
+[Wed Dec 16 16:04:49 CST 2020] Getting webroot for domain='*.devopsing.site'
+[Wed Dec 16 16:04:49 CST 2020] Add the following TXT record:
+[Wed Dec 16 16:04:49 CST 2020] Domain: '_acme-challenge.devopsing.site'
+[Wed Dec 16 16:04:49 CST 2020] TXT value: '-jEWdpI5yOETrfGf3EVh01_a3ywrW426wmppjuDqXOs'
+[Wed Dec 16 16:04:49 CST 2020] Please be aware that you prepend _acme-challenge. before your domain
+[Wed Dec 16 16:04:49 CST 2020] so the resulting subdomain will be: _acme-challenge.devopsing.site
+[Wed Dec 16 16:04:49 CST 2020] Please add the TXT records to the domains, and re-run with --renew.
+[Wed Dec 16 16:04:49 CST 2020] Please add '--debug' or '--log' to check more details.
+[Wed Dec 16 16:04:49 CST 2020] See: https://github.com/acmesh-official/acme.sh/wiki/How-to-debug-acme.sh
+
+
+root@ecs-ubuntu18:/home/user/acme.sh# ./acme.sh --issue --renew -d *.devopsing.site  --dns --yes-I-know-dns-manual-mode-enough-go-ahead-please
+[Wed Dec 16 16:09:16 CST 2020] Renew: '*.devopsing.site'
+[Wed Dec 16 16:09:18 CST 2020] Using CA: https://acme-v02.api.letsencrypt.org/directory
+[Wed Dec 16 16:09:18 CST 2020] Single domain='*.devopsing.site'
+[Wed Dec 16 16:09:18 CST 2020] Getting domain auth token for each domain
+[Wed Dec 16 16:09:18 CST 2020] Verifying: *.devopsing.site
+[Wed Dec 16 16:09:25 CST 2020] Pending
+[Wed Dec 16 16:09:29 CST 2020] Pending
+[Wed Dec 16 16:09:32 CST 2020] Pending
+[Wed Dec 16 16:09:36 CST 2020] Pending
+[Wed Dec 16 16:09:40 CST 2020] Pending
+[Wed Dec 16 16:09:43 CST 2020] Success
+[Wed Dec 16 16:09:43 CST 2020] Verify finished, start to sign.
+[Wed Dec 16 16:09:43 CST 2020] Lets finalize the order.
+[Wed Dec 16 16:09:43 CST 2020] Le_OrderFinalize='https://acme-v02.api.letsencrypt.org/acme/finalize/106492827/6770422148'
+[Wed Dec 16 16:09:46 CST 2020] Downloading cert.
+[Wed Dec 16 16:09:46 CST 2020] Le_LinkCert='https://acme-v02.api.letsencrypt.org/acme/cert/031361ea01a84ba5cdd3cc07cc3900693274'
+[Wed Dec 16 16:09:49 CST 2020] Cert success.
+-----BEGIN CERTIFICATE-----
+MIIFJzCCBA+gAwIBAgISAxNh6gGoS6XN08wHzDkAaTJ0MA0GCSqGSIb3DQEBCwUA
+MDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQD
+EwJSMzAeFw0yMDEyMTYwNzA5NDVaFw0yMTAzMTYwNzA5NDVaMBsxGTAXBgNVBAMM
+ECouZGV2b3BzaW5nLnNpdGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQDiP60O0hdAczWXZqa3eQ/C67NWYeXv3HNwKivxWHB7nyRYZob5joz6EC12bOvC
+fbzbonmklz0++/0Ek12jVOffDFHHas9Bcmfp+1fKWOS9EZ2tZwLJgFV3c70JZ5bJ
+YwY7lkpzFFRoj5CtyrMP5zYYeXVLRVxXByB70L7xvwmELS3DLOtdQaS2xv5/PQsi
+1FrlcpomPL7IETqX54HvvXtBWhnqisZPNsNNhrevNRdZAKEUSiK06xBll+7KuPwy
+U6ExI4pUArY6jpDAgn2SAsD5JInnOQvZQIpSoFMAMPU2Y0RnO3vf3d01egiDCX3+
+ayrbii7/TAfNKgm4cRSKK3yfAgMBAAGjggJMMIICSDAOBgNVHQ8BAf8EBAMCBaAw
+HQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYD
+VR0OBBYEFGHVekA0mFFdF0wq7TkPQ7dxJFyTMB8GA1UdIwQYMBaAFBQusxe3WFbL
+rlAJQOYfr52LFMLGMFUGCCsGAQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDov
+L3IzLm8ubGVuY3Iub3JnMCIGCCsGAQUFBzAChhZodHRwOi8vcjMuaS5sZW5jci5v
+cmcvMBsGA1UdEQQUMBKCECouZGV2b3BzaW5nLnNpdGUwTAYDVR0gBEUwQzAIBgZn
+gQwBAgEwNwYLKwYBBAGC3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5s
+ZXRzZW5jcnlwdC5vcmcwggEFBgorBgEEAdZ5AgQCBIH2BIHzAPEAdgD2XJQv0Xcw
+IhRUGAgwlFaO400TGTO/3wwvIAvMTvFk4wAAAXZqmRMuAAAEAwBHMEUCIBtu2Gtn
+nZ6G3lu+H0YbXVDhaQRECEhZSDja3PF2pOLLAiEArKkOMd5glxg9rqdfhjtTTMI9
+PGyJkryVtcWDQ+lyGMkAdwBc3EOS/uarRUSxXprUVuYQN/vV+kfcoXOUsl7m9scO
+ygAAAXZqmRUjAAAEAwBIMEYCIQCR4ATKBbAJ9cND46oQFb01AKajDk8EIOPO4PID
+c+353QIhAKq5CcINAryv3gSftrIfl1wZUnQNMZ7Vq7Ol2DxqleHlMA0GCSqGSIb3
+DQEBCwUAA4IBAQCi+jAU3uSi1JK8xo7lHl41AnSQqJxRMOxBN+pdXw1N4YBvkSuF
+6uJdDlZV145bMNIhIgxT5zT2sohwyNfwCOrhePfxxyDE+iYCcNfBxgMPth6OBRBc
+dZ5TfEa+kFbXLXo75+B7xEJGN0A132hLd++Q0AxIid7sbrzMWXxLcuawuqZG3Tfh
+V5xH9d9KptlQZklpNyXTNmqaX/3kcg1lnwe5/9GtDDlsRHlfl1rCZeOJCvMMOThR
+hCYxkmEmYPA91MntAZgHLUxLfIDIsmjfFVnj1A8R86UWsB0TmF6L0t66sRhWNs7T
+8RdmXSbckcYD1Nl63LoPhMnk9IKufeRPQEEs
+-----END CERTIFICATE-----
+[Wed Dec 16 16:09:49 CST 2020] Your cert is in  /root/.acme.sh/*.devopsing.site/*.devopsing.site.cer
+[Wed Dec 16 16:09:49 CST 2020] Your cert key is in  /root/.acme.sh/*.devopsing.site/*.devopsing.site.key
+[Wed Dec 16 16:09:49 CST 2020] The intermediate CA cert is in  /root/.acme.sh/*.devopsing.site/ca.cer
+[Wed Dec 16 16:09:49 CST 2020] And the full chain certs is there:  /root/.acme.sh/*.devopsing.site/fullchain.cer

@@ -1,0 +1,48 @@
+user@owen-ubuntu:~/Aug-git/group-AugOps/devops/shell/lets-encrypt$ ./acme.sh  --issue  -d mydomain.com -d www.mydomain.com  --webroot  /home/wwwroot/mydomain.com/
+[2020年 12月 16日 星期三 11:38:00 CST] Using CA: https://acme-v02.api.letsencrypt.org/directory
+[2020年 12月 16日 星期三 11:38:00 CST] Create account key ok.
+[2020年 12月 16日 星期三 11:38:00 CST] Registering account: https://acme-v02.api.letsencrypt.org/directory
+[2020年 12月 16日 星期三 11:38:04 CST] Registered
+[2020年 12月 16日 星期三 11:38:04 CST] ACCOUNT_THUMBPRINT='UM9ckODi3kX_z3vOENL1sdE4M2LI36HR9wJ7-AyGouo'
+[2020年 12月 16日 星期三 11:38:04 CST] Creating domain key
+[2020年 12月 16日 星期三 11:38:04 CST] The domain key is here: /home/user/.acme.sh/mydomain.com/mydomain.com.key
+[2020年 12月 16日 星期三 11:38:04 CST] Multi domain='DNS:mydomain.com,DNS:www.mydomain.com'
+[2020年 12月 16日 星期三 11:38:04 CST] Getting domain auth token for each domain
+[2020年 12月 16日 星期三 11:38:12 CST] Getting webroot for domain='mydomain.com'
+[2020年 12月 16日 星期三 11:38:12 CST] Getting webroot for domain='www.mydomain.com'
+[2020年 12月 16日 星期三 11:38:12 CST] Verifying: mydomain.com
+mkdir: cannot create directory ‘/home/wwwroot’: Permission denied
+./acme.sh: 4577: cannot create /home/wwwroot/mydomain.com//.well-known/acme-challenge/X8BoP_cME1p1wi-3wuOxphdT7K4mIdS1aFs_qsDPKhM: Directory nonexistent
+[2020年 12月 16日 星期三 11:38:12 CST] mydomain.com:Can not write token to file : /home/wwwroot/mydomain.com//.well-known/acme-challenge/X8BoP_cME1p1wi-3wuOxphdT7K4mIdS1aFs_qsDPKhM
+[2020年 12月 16日 星期三 11:38:12 CST] Please add '--debug' or '--log' to check more details.
+[2020年 12月 16日 星期三 11:38:12 CST] See: https://github.com/acmesh-official/acme.sh/wiki/How-to-debug-acme.sh
+
+
+user@ecs-ubuntu18:~/acme.sh$ ./acme.sh --install
+[Wed Dec 16 12:20:17 CST 2020] It is recommended to install socat first.
+[Wed Dec 16 12:20:17 CST 2020] We use socat for standalone server if you use standalone mode.
+[Wed Dec 16 12:20:17 CST 2020] If you don't use standalone mode, just ignore this warning.
+[Wed Dec 16 12:20:17 CST 2020] Installing to /home/user/.acme.sh
+[Wed Dec 16 12:20:17 CST 2020] Installed to /home/user/.acme.sh/acme.sh
+[Wed Dec 16 12:20:17 CST 2020] Installing alias to '/home/user/.bashrc'
+[Wed Dec 16 12:20:17 CST 2020] OK, Close and reopen your terminal to start using acme.sh
+[Wed Dec 16 12:20:17 CST 2020] Installing cron job
+no crontab for user
+no crontab for user
+[Wed Dec 16 12:20:17 CST 2020] Good, bash is found, so change the shebang to use bash as preferred.
+[Wed Dec 16 12:20:17 CST 2020] OK
+
+
+user@ecs-ubuntu18:~/acme.sh$ ./acme.sh --install
+[Wed Dec 16 12:31:06 CST 2020] It is recommended to install socat first.
+[Wed Dec 16 12:31:06 CST 2020] We use socat for standalone server if you use standalone mode.
+[Wed Dec 16 12:31:06 CST 2020] If you don't use standalone mode, just ignore this warning.
+[Wed Dec 16 12:31:06 CST 2020] Installing to /home/user/.acme.sh
+[Wed Dec 16 12:31:06 CST 2020] Installed to /home/user/.acme.sh/acme.sh
+[Wed Dec 16 12:31:06 CST 2020] Installing alias to '/home/user/.bashrc'
+[Wed Dec 16 12:31:06 CST 2020] OK, Close and reopen your terminal to start using acme.sh
+[Wed Dec 16 12:31:06 CST 2020] Installing cron job
+17 0 * * * "/home/user/.acme.sh"/acme.sh --cron --home "/home/user/.acme.sh" > /dev/null
+[Wed Dec 16 12:31:06 CST 2020] Good, bash is found, so change the shebang to use bash as preferred.
+[Wed Dec 16 12:31:07 CST 2020] OK
+user@ecs-ubuntu18:~/acme.sh$ acme.sh

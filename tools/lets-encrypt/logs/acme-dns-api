@@ -1,0 +1,48 @@
+root@ecs-ubuntu18:/home/user# export Ali_Key="LTAI4FyrEoJi8qEeKeRios2r"
+root@ecs-ubuntu18:/home/user# export Ali_Secret="nIpymix0sYSj6a0bJNgERE0QzjSrkF"
+root@ecs-ubuntu18:/home/user# acme.sh --issue --dns dns_ali -d *.devopsing.site --force
+[Thu Dec 17 13:55:52 CST 2020] Using CA: https://acme-v02.api.letsencrypt.org/directory
+[Thu Dec 17 13:55:52 CST 2020] Single domain='*.devopsing.site'
+[Thu Dec 17 13:55:52 CST 2020] Getting domain auth token for each domain
+[Thu Dec 17 13:55:59 CST 2020] Getting webroot for domain='*.devopsing.site'
+[Thu Dec 17 13:55:59 CST 2020] *.devopsing.site is already verified, skip dns-01.
+[Thu Dec 17 13:55:59 CST 2020] Verify finished, start to sign.
+[Thu Dec 17 13:55:59 CST 2020] Lets finalize the order.
+[Thu Dec 17 13:55:59 CST 2020] Le_OrderFinalize='https://acme-v02.api.letsencrypt.org/acme/finalize/106492827/6786836920'
+[Thu Dec 17 13:56:01 CST 2020] Downloading cert.
+[Thu Dec 17 13:56:01 CST 2020] Le_LinkCert='https://acme-v02.api.letsencrypt.org/acme/cert/04cb4d0d078d5b316059429909851612b66d'
+[Thu Dec 17 13:56:03 CST 2020] Cert success.
+-----BEGIN CERTIFICATE-----
+MIIFJTCCBA2gAwIBAgISBMtNDQeNWzFgWUKZCYUWErZtMA0GCSqGSIb3DQEBCwUA
+MDIxCzAJBgNVBAYTAlVTMRYwFAYDVQQKEw1MZXQncyBFbmNyeXB0MQswCQYDVQQD
+EwJSMzAeFw0yMDEyMTcwNDU2MDFaFw0yMTAzMTcwNDU2MDFaMBsxGTAXBgNVBAMM
+ECouZGV2b3BzaW5nLnNpdGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIB
+AQDiP60O0hdAczWXZqa3eQ/C67NWYeXv3HNwKivxWHB7nyRYZob5joz6EC12bOvC
+fbzbonmklz0++/0Ek12jVOffDFHHas9Bcmfp+1fKWOS9EZ2tZwLJgFV3c70JZ5bJ
+YwY7lkpzFFRoj5CtyrMP5zYYeXVLRVxXByB70L7xvwmELS3DLOtdQaS2xv5/PQsi
+1FrlcpomPL7IETqX54HvvXtBWhnqisZPNsNNhrevNRdZAKEUSiK06xBll+7KuPwy
+U6ExI4pUArY6jpDAgn2SAsD5JInnOQvZQIpSoFMAMPU2Y0RnO3vf3d01egiDCX3+
+ayrbii7/TAfNKgm4cRSKK3yfAgMBAAGjggJKMIICRjAOBgNVHQ8BAf8EBAMCBaAw
+HQYDVR0lBBYwFAYIKwYBBQUHAwEGCCsGAQUFBwMCMAwGA1UdEwEB/wQCMAAwHQYD
+VR0OBBYEFGHVekA0mFFdF0wq7TkPQ7dxJFyTMB8GA1UdIwQYMBaAFBQusxe3WFbL
+rlAJQOYfr52LFMLGMFUGCCsGAQUFBwEBBEkwRzAhBggrBgEFBQcwAYYVaHR0cDov
+L3IzLm8ubGVuY3Iub3JnMCIGCCsGAQUFBzAChhZodHRwOi8vcjMuaS5sZW5jci5v
+cmcvMBsGA1UdEQQUMBKCECouZGV2b3BzaW5nLnNpdGUwTAYDVR0gBEUwQzAIBgZn
+gQwBAgEwNwYLKwYBBAGC3xMBAQEwKDAmBggrBgEFBQcCARYaaHR0cDovL2Nwcy5s
+ZXRzZW5jcnlwdC5vcmcwggEDBgorBgEEAdZ5AgQCBIH0BIHxAO8AdQBc3EOS/uar
+RUSxXprUVuYQN/vV+kfcoXOUsl7m9scOygAAAXZvRP8XAAAEAwBGMEQCIH/AHHtf
+9df7hXJAQHi6omYLWQAHlfLfl4H1lLUxjMmUAiAMAMhpyk6uR3QBsoFCUONUq5dS
+kXP+rikzVmmY*****************4hVaCTCwMqeUol5K8UOeAl/LmqXaJl+IvDX
+AAABdm9E/zYAAAQDAEcwRQIhAMiIYYXlqvAxDXFlICSwOOGUwlYO/VhpaQcnkk60
+G6z9AiAIoB2HVjgkY4P29tphrs+mPUpRDxUfrnwvbLcaUYYfVjANBgkqhkiG9w0B
+AQsFAAOCAQEAaH44bbkAVxZ/0JST9+epCmSU0DOzrfDTF2zLJo6C44TuigfWRvgS
+y/lwMlY4SqmR5hddGiWpn+OiOa9R5rkpvbvOCIsutAku312YG8vXj6FS02fSvGzu
+HYUE5pUleNyfnGo6l7P1MtAzs5rDk1fhTbva2CKLZEwWM6NM3Y6nG8AyjwRayBmU
+9lyqZZwdKchGhiiCum4XPQDrSwZ2qj+4bpJvnb/4RyTEJCp4TjFWSvVx/q1nWYpY
+/p9IX/N53GEHdrRv6OYNSGJZZ+EJPt+SPSI2qhf/nzC3xZdewtFRmqfi3ot/iI8g
+BNDyCCgmBUsVEh++X2JcP9/NndS8ufQ2lQ==
+-----END CERTIFICATE-----
+[Thu Dec 17 13:56:03 CST 2020] Your cert is in  /root/.acme.sh/*.devopsing.site/*.devopsing.site.cer
+[Thu Dec 17 13:56:03 CST 2020] Your cert key is in  /root/.acme.sh/*.devopsing.site/*.devopsing.site.key
+[Thu Dec 17 13:56:03 CST 2020] The intermediate CA cert is in  /root/.acme.sh/*.devopsing.site/ca.cer
+[Thu Dec 17 13:56:03 CST 2020] And the full chain certs is there:  /root/.acme.sh/*.devopsing.site/fullchain.cer
