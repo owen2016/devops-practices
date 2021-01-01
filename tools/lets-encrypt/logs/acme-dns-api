@@ -1,5 +1,5 @@
-root@ecs-ubuntu18:/home/user# export Ali_Key="LTAI4FyrEoJi8qEeKeRios2r"
-root@ecs-ubuntu18:/home/user# export Ali_Secret="nIpymix0sYSj6a0bJNgERE0QzjSrkF"
+root@ecs-ubuntu18:/home/user# export Ali_Key="LTAI4&&&&&i8qEeKeRios2r"
+root@ecs-ubuntu18:/home/user# export Ali_Secret="nIpymix******bJNgERE0QzjSrkF"
 root@ecs-ubuntu18:/home/user# acme.sh --issue --dns dns_ali -d *.devopsing.site --force
 [Thu Dec 17 13:55:52 CST 2020] Using CA: https://acme-v02.api.letsencrypt.org/directory
 [Thu Dec 17 13:55:52 CST 2020] Single domain='*.devopsing.site'
