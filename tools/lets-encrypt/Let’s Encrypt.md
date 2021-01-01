@@ -205,8 +205,8 @@ acme.sh --issue --dns dns_ali -d *.example.com --force
 **示例：**
 
 ``` shell
-export Ali_Key="LTAI4FyrEoJi8qEeKeRios2r"
-export Ali_Secret="nIpymix0sYSj6a0bJNgERE0QzjSrkF"
+export Ali_Key="LTAI4F****i8qEeKeRios2r"
+export Ali_Secret="nIpymix0s****a0bJNgERE0QzjSrkF"
 acme.sh --issue --dns dns_ali -d *.devopsing.site --force
 ```
 
