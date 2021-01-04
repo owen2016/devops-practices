@@ -1,2 +1,4 @@
 FROM fluent/fluentd
-RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-rdoc", "--no-ri"]
+USER root
+# RUN ["gem", "install", "fluent-plugin-elasticsearch", "--no-document", "--version", "4.3.1"]
+# USER fluent
