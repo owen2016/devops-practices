@@ -1,0 +1,1 @@
+按顺序分别kubectl apply部署nexus3，部署完成后可查看相关nexus资源。

@@ -1,0 +1,6 @@
+
+#创建namespace - nexus
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: nexus

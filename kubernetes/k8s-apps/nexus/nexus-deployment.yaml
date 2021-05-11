@@ -1,0 +1,88 @@
+#创建nexus deployment，这里containers端口开放了8081、8082、8083分别作为web管理页面、docker repo、maven repo，且通过traefik2将web、docker域名开放
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nexus-deployment
+  namespace: nexus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nexus
+  template:
+    metadata:
+      labels:
+        app: nexus
+    spec:
+      containers:
+      - name: nexus
+        image: sonatype/nexus3
+        ports:
+        -  containerPort: 8081
+        -  containerPort: 8082
+        -  containerPort: 8083
+        resources:
+          requests:
+            memory: "128Mi"
+          limits:
+            memory: "2Gi"
+            cpu: 4
+        volumeMounts:
+        - mountPath: /nexus-data
+          name: nexus-data
+      volumes:
+        - name: nexus-data
+          persistentVolumeClaim:
+            claimName: nexus-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nexus-svc
+  namespace: nexus
+spec:
+  selector:
+    app: nexus
+  ports:
+    - name: web
+      protocol: TCP
+      port: 8081
+      targetPort: 8081
+    - name: docker
+      protocol: TCP
+      port: 8082
+      targetPort: 8082
+    - name: maven
+      protocol: TCP
+      port: 8083
+      targetPort: 8083
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: nexus
+  namespace: nexus
+spec:
+  entryPoints:
+    - http
+  routes:
+    - match: Host(`nexus3.domain.com`) && PathPrefix(`/`) 
+      kind: Rule
+      priority: 1
+      middlewares:
+        - name: compress 
+          namespace: default
+      services:
+        - name: nexus-svc
+          namespace: nexus
+          port: 8081
+    - match: Host(`repo-nexus.domain.com`) && PathPrefix(`/`) 
+      kind: Rule
+      priority: 1
+      middlewares:
+        - name: compress 
+          namespace: default
+      services:
+        - name: nexus-svc
+          namespace: nexus
+          port: 8082

@@ -1,0 +1,17 @@
+#创建 pv，这里使用aliyun的nas作为pv
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nexus-pv
+  name: nexus
+  labels:
+    alicloud-nfs: nexus-pv
+spec:
+  capacity:
+    storage: 500Gi
+  accessModes:
+    - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    server: "xxxxx.cn-hangzhou.nas.aliyuncs.com"
+    path: /nexus/

@@ -1,0 +1,15 @@
+#创建pvc，注意labels对齐
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nexus-pvc
+  namespace: nexus
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 500Gi
+  selector:
+    matchLabels:
+      alicloud-nfs: nexus-pv
