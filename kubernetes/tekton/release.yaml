@@ -1645,19 +1645,19 @@ spec:
       serviceAccountName: tekton-pipelines-controller
       containers:
         - name: tekton-pipelines-controller
-          image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/controller:v0.20.1@sha256:2e7c84d4280a03d75a7a8f32dbe4084f608f01d7ddf43f903560645bd6cd46de
+          image: aguncn/tektoncd-controller:v0.20.1
           args: [
             # Version, to be replace at release time
             "-version", "v0.20.1",
             # These images are built on-demand by `ko resolve` and are replaced
             # by image references by digest.
-            "-kubeconfig-writer-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/kubeconfigwriter:v0.20.1@sha256:b2c6d0962cda88fb3095128b6202da9b0e6c9c0df3ef6cf7863505ffd25072fd", "-git-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/git-init:v0.20.1@sha256:a0f7a0948152a401f587dde580b41b5e80b52f3432aba7902166aa79941e8835", "-entrypoint-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/entrypoint:v0.20.1@sha256:15f7c3c278decc9373dfe49e220734fb9f55bfc5263ddbbddb44ac24ed7d4638", "-nop-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/nop:v0.20.1@sha256:4e2aeda1d2ffc7d4d71ab5967ef42706f4957b45ec43742b2d3b9e846d3db0d2", "-imagedigest-exporter-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/imagedigestexporter:v0.20.1@sha256:b3cde192d0f82d49ef93d3f3f0c0f60fac116463c021a85619b273425655feb7", "-pr-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/pullrequest-init:v0.20.1@sha256:69633ecd0e948f6462c61bb9e008b940a05b143ef51c67e6e4093278a23dac53", "-build-gcs-fetcher-image", "gcr.io/tekton-releases/github.com/tektoncd/pipeline/vendor/github.com/googlecloudplatform/cloud-builders/gcs-fetcher/cmd/gcs-fetcher:v0.20.1@sha256:184a9ee5730cdd4fd219c9f57b503b1bb1b5093b53f359cbd118ab58f7959dd4",
+            "-kubeconfig-writer-image", "aguncn/tektoncd-kubeconfigwriter:v0.20.1", "-git-image", "aguncn/tektoncd-git-init:v0.20.1", "-entrypoint-image", "aguncn/tektoncd-entrypoint:v0.20.1", "-nop-image", "aguncn/tektoncd-nop:v0.20.1", "-imagedigest-exporter-image", "aguncn/tektoncd-imagedigestexporter:v0.20.1", "-pr-image", "aguncn/tektoncd-pullrequest-init:v0.20.1", "-build-gcs-fetcher-image", "aguncn/tektoncd-gcs-fetcher:v0.20.1",
             # This is gcr.io/google.com/cloudsdktool/cloud-sdk:302.0.0-slim
-            "-gsutil-image", "gcr.io/google.com/cloudsdktool/cloud-sdk@sha256:27b2c22bf259d9bc1a291e99c63791ba0c27a04d2db0a43241ba0f1f20f4067f",
+            "-gsutil-image", "aguncn/cloudsdktool-cloud-sdk",
             # The shell image must be root in order to create directories and copy files to PVCs.
             # gcr.io/distroless/base:debug as of November 15, 2020
             # image shall not contains tag, so it will be supported on a runtime like cri-o
-            "-shell-image", "gcr.io/distroless/base@sha256:92720b2305d7315b5426aec19f8651e9e04222991f877cae71f40b3141d2f07e"]
+            "-shell-image", "aguncn/distroless-base"]
           volumeMounts:
             - name: config-logging
               mountPath: /etc/config-logging
@@ -1897,7 +1897,7 @@ spec:
         - name: webhook
           # This is the Go import path for the binary that is containerized
           # and substituted here.
-          image: gcr.io/tekton-releases/github.com/tektoncd/pipeline/cmd/webhook:v0.20.1@sha256:48708800185088e4a87c3ceb8fb1059ea657efa46fe091af87173ab635ef3309
+          image: aguncn/tektoncd-webhook:v0.20.1
           # Resource request required for autoscaler to take any action for a metric
           resources:
             requests:

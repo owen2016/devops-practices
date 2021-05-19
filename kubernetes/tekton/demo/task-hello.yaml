@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1beta1
+kind: Task
+metadata:
+  name: hello-tekton
+spec:
+  steps:
+    - name: hello-tekton
+      image: rancher/library-busybox:1.31.1
+      command:
+        - echo
+      args:
+        - "Hello Tekton!"
