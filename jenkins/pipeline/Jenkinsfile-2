@@ -1,0 +1,52 @@
+pipeline {
+    agent {
+        docker { image 'node:7-alpine' }
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'node --version'
+            }
+        }
+    }
+}
+
+
+pipeline {
+    agent {
+        dockerfile true
+    }
+    stages {
+        stage('Test') {
+            steps {
+                sh 'node --version'
+            }
+        }
+    }
+}
+
+pipeline {
+    agent  {
+        node {
+            label 'java'
+        }
+    }
+    environment {
+        BRANCH = "${BRANCH}"
+        M2_HOME = '/usr/lib/maven/apache-maven-3.6.0'
+        PATH = "${env.PATH}:${env.M2_HOME}/bin"
+    }
+    stages {
+        // 执行远程主机上的脚本，先做好免密工作
+        stage('Ssh Stage') {
+            when {
+                environment name: 'BRANCH', value: 'develop'
+            }
+            steps {
+                sh 'ssh user@172.20.249.6 "sh /home/user/test.sh"'
+            }
+        }
+    }
+}
+
+
