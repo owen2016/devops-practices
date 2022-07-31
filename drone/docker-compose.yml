@@ -1,0 +1,58 @@
+version: "3.6"
+services:
+
+  # gogs 服务镜像
+  gogs:
+    image: gogs/gogs
+    container_name: gogs
+    restart: always
+    ports:
+      - "10022:22"	# ssh 端口
+      - "9999:3000" # gogs仓库
+    volumes:
+      - /data/docker_test/gogs:/data	# gogs 挂载卷
+  
+  # drone server 端
+  drone:
+    image: drone/drone:latest
+    container_name: drone-server
+    ports:
+      - "10080:80"	# drone 服务：HTTP
+      - "10443:443"	# drone 服务：HTTPS
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock	# 本地docker
+      - /data/docker_test/drone:/var/lib/drone/	# 挂载卷
+    restart: always
+    environment:
+      - TZ=Asia/Shanghai
+      - DRONE_OPEN=true
+      - DRONE_GOGS_SERVER=http://服务器host:9999/	# 不同的代码仓库对应不同的key, v: 服务器仓库地址
+      - DRONE_SERVER_HOST=服务器host:10080 # drone 的server端地址
+      - DRONE_SERVER_PROTO=http
+      - DRONE_LOGS_TRACE=true
+      - DRONE_LOGS_DEBUG=true
+      - DRONE_GOGS=true
+      - DRONE_PROVIDER=gogs	# 代码仓库
+      - DRONE_RPC_SECRET=2cbdaab90813f3743dc700816a322c62  # 秘钥与runner一致
+      - DRONE_USER_CREATE=username:管理员账户,admin:true	# 设置管理员账户, 与gogs一致, 否则无法使用缓存
+  
+  # drone runner 端, 用于执行pipeline
+  drone-runner:
+    image: drone/drone-runner-docker:1
+    container_name: drone-docker-runner	# docker 与 ssh 有不同的runner
+    restart: always
+    ports:
+      - 10082:3000	# 端口映射
+    depends_on:
+      - drone	# server端先构建启动
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock	# 本机docker
+    environment:
+      - TZ=Asia/Shanghai
+      - DRONE_DEBUG=true
+      - DRONE_RPC_SECRET=2cbdaab90813f3743dc700816a322c62	# 秘钥与server端一致
+      - DRONE_RPC_HOST=服务器host:10080	# server端
+      - DRONE_RPC_PROTO=http
+      - DRONE_RUNNER_CAPACITY=2
+      - DRONE_RUNNER_NAME=drone-runner
+
