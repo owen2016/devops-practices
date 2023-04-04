@@ -10,16 +10,16 @@ jenkins系统管理下的插件管理，在线安装Gitlab Hook Plugin和Gitlab 
 
 创建pipeline时， 勾选"Build when a change is pushed to GitLab". 记住后面的GitLab CI Service URL 后面要填在gitlab的webhooks中; 同时点击“高级”，生成 “Secret token“
 
-![Jenkins-webhook1](./_images/webhook-1.png)
+![Jenkins-webhook1](./_images/webhook-1.jpg)
 
 ### 3. gitlab webhook 配置
 
 在链接那里输入之前jenkins上提供的webhook url 以及“Secret token“，编辑完后保存
 
-![Jenkins-webhook2](./_images/webhook-2.png)
+![Jenkins-webhook2](./_images/webhook-2.jpg)
 
 点击测试，如果返回200，那就成功了，去jenkins看看有没有自动构建的记录
-![Jenkins-webhook3](./_images/webhook-3.png)
+![Jenkins-webhook3](./_images/webhook-3.jpg)
 
 ## jenkins build结果反馈给gitlab
 
